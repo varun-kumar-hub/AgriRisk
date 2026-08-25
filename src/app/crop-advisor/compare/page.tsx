@@ -1,10 +1,15 @@
+"use client";
+
 import Link from "next/link";
+import { CustomInputPanel } from "@/components/forms/custom-input-modal";
+import { useUserInput } from "@/components/providers/user-input-provider";
 import { Card, CardTitle } from "@/components/ui/card";
 import { RiskBadge } from "@/components/ui/risk-badge";
-import { cropRecommendations } from "@/lib/mock/data";
 import { formatCurrency } from "@/lib/scoring/risk";
 
 export default function CropComparePage() {
+  const { recommendations } = useUserInput();
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <header>
@@ -12,6 +17,9 @@ export default function CropComparePage() {
         <h1 className="mt-1 text-3xl font-bold">Crop Comparison</h1>
         <p className="mt-2 text-slate-600">Compare crops by suitability, risk, yield, and risk-adjusted economic return.</p>
       </header>
+
+      <CustomInputPanel />
+
       <Card className="mt-6 overflow-x-auto">
         <CardTitle>Decision Matrix</CardTitle>
         <table className="mt-4 min-w-full text-left text-sm">
@@ -29,7 +37,7 @@ export default function CropComparePage() {
             </tr>
           </thead>
           <tbody>
-            {cropRecommendations.map((crop) => (
+            {recommendations.map((crop) => (
               <tr key={crop.crop} className="border-b last:border-0">
                 <td className="py-4 pr-5 font-semibold"><Link href={`/crop-advisor/${crop.crop.toLowerCase()}`}>{crop.crop}</Link></td>
                 <td className="py-4 pr-5">{crop.decisionScore}</td>
@@ -48,3 +56,4 @@ export default function CropComparePage() {
     </div>
   );
 }
+

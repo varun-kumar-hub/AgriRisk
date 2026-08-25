@@ -1,22 +1,30 @@
+"use client";
+
 import Link from "next/link";
 import { AlertTriangle, ArrowRight, Sprout, Tractor } from "lucide-react";
 import { RiskTrendChart } from "@/components/charts/risk-trend-chart";
+import { CustomInputPanel } from "@/components/forms/custom-input-modal";
+import { useUserInput } from "@/components/providers/user-input-provider";
 import { Card, CardTitle } from "@/components/ui/card";
 import { MetricCard } from "@/components/ui/metric";
 import { RiskBadge } from "@/components/ui/risk-badge";
-import { alerts, cropHealth, cropRisk, demoFarm, recommendations } from "@/lib/mock/data";
+import { alerts, cropHealth, recommendations } from "@/lib/mock/data";
 
 export default function DashboardPage() {
+  const { farm, cropRisk } = useUserInput();
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-medium text-crop">Kharif 2026 · {demoFarm.location}</p>
+          <p className="text-sm font-medium text-crop">Kharif 2026 · {farm.location}</p>
           <h1 className="mt-1 text-3xl font-bold text-slate-950">Good evening, Varun.</h1>
-          <p className="mt-1 text-slate-600">Here is your agricultural intelligence overview.</p>
+          <p className="mt-1 text-slate-600">Here is your agricultural intelligence overview for {farm.name}.</p>
         </div>
-        <p className="text-sm text-slate-500">Risk prediction updated 2 hours ago</p>
+        <p className="text-sm text-slate-500">Risk prediction updated live</p>
       </header>
+
+      <CustomInputPanel />
 
       <section className="mt-6 grid gap-4 md:grid-cols-2">
         <Link href="/crop-advisor" className="rounded-lg border border-emerald-200 bg-emerald-50 p-5 hover:bg-emerald-100">
@@ -34,7 +42,7 @@ export default function DashboardPage() {
       </section>
 
       <section className="mt-6 grid gap-4 md:grid-cols-4">
-        <MetricCard title="Overall Agricultural Risk" value={`${cropRisk.overallScore}/100`} detail="Up 12% this week">
+        <MetricCard title="Overall Agricultural Risk" value={`${cropRisk.overallScore}/100`} detail="Dynamic risk calculation">
           <div className="mt-3"><RiskBadge level={cropRisk.level} /></div>
         </MetricCard>
         <MetricCard title="Crop Health" value={`${cropHealth.score}/100`} detail={`${cropHealth.label} · Vegetative stage`} />
