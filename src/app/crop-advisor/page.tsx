@@ -5,6 +5,7 @@ import { Sparkles, RefreshCw } from "lucide-react";
 import { HistoricalTrendsVisualizer } from "@/components/analytics/historical-trends";
 import { CropCard } from "@/components/crop-advisor/crop-card";
 import { CustomInputPanel } from "@/components/forms/custom-input-modal";
+import { TargetCropStatusBanner } from "@/components/crop-advisor/target-crop-banner";
 import { useUserInput } from "@/components/providers/user-input-provider";
 import { useToast } from "@/components/providers/toast-provider";
 import { ApiProgressStepper, ProgressStep } from "@/components/ui/api-progress-stepper";
@@ -80,6 +81,8 @@ export default function CropAdvisorPage() {
       </header>
 
       <CustomInputPanel />
+
+      <TargetCropStatusBanner />
 
       {/* Step-by-Step API Progress Communicator */}
       {analyzing && (

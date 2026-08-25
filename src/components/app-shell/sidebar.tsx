@@ -27,7 +27,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useTranslation } from "@/lib/i18n/i18n-context";
-import { LanguageSelector } from "@/components/ui/language-selector";
 import { ProfilePopover } from "@/components/app-shell/profile-popover";
 import { SignOutModal } from "@/components/modals/signout-modal";
 
@@ -103,16 +102,13 @@ export function Sidebar() {
           <span className="font-bold text-base text-slate-950">AgriRisk</span>
         </Link>
 
-        <div className="flex items-center gap-2">
-          <LanguageSelector compact />
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="rounded-lg border border-slate-300 p-2 text-slate-700 hover:bg-slate-100 active:scale-95 cursor-pointer"
-            aria-label="Toggle navigation menu"
-          >
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          className="rounded-lg border border-slate-300 p-2 text-slate-700 hover:bg-slate-100 active:scale-95 cursor-pointer"
+          aria-label="Toggle navigation menu"
+        >
+          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
       </div>
 
       {/* Backdrop overlay for mobile drawer */}
@@ -123,9 +119,9 @@ export function Sidebar() {
         />
       )}
 
-      {/* Main Collapsible Sidebar (Desktop & Mobile Drawer) */}
+      {/* Main Collapsible Sidebar (Fixed Shell, Inner Nav Scrollable) */}
       <aside
-        className={`sticky top-0 z-50 flex h-screen shrink-0 flex-col justify-between overflow-y-auto border-r border-slate-200 bg-white py-5 transition-all duration-300 ease-in-out ${
+        className={`sticky top-0 z-50 flex h-screen shrink-0 flex-col justify-between overflow-hidden border-r border-slate-200 bg-white py-4 transition-all duration-300 ease-in-out ${
           isCollapsed ? "w-20 px-2" : "w-64 px-4"
         } ${
           mobileOpen
@@ -133,80 +129,74 @@ export function Sidebar() {
             : "hidden lg:flex"
         }`}
       >
-        <div>
-          {/* Header & Collapse Toggle Button */}
-          <div className="flex items-center justify-between px-1">
-            <Link href="/dashboard" className="flex items-center gap-3">
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-crop text-white shadow-md">
-                <Sprout size={22} />
+        {/* Fixed Header Section */}
+        <div className="shrink-0 flex items-center justify-between px-1 pb-3 border-b border-slate-100">
+          <Link href="/dashboard" className="flex items-center gap-3">
+            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-crop text-white shadow-md">
+              <Sprout size={22} />
+            </span>
+            {!isCollapsed && (
+              <span className="animate-in fade-in duration-200">
+                <span className="block text-lg font-bold text-slate-950">AgriRisk</span>
+                <span className="text-xs text-slate-500 font-medium">{t("common.tagline")}</span>
               </span>
-              {!isCollapsed && (
-                <span className="animate-in fade-in duration-200">
-                  <span className="block text-lg font-bold text-slate-950">AgriRisk</span>
-                  <span className="text-xs text-slate-500 font-medium">{t("common.tagline")}</span>
-                </span>
-              )}
-            </Link>
+            )}
+          </Link>
 
-            {/* Desktop Collapse / Expand Toggle Icon */}
-            <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="hidden lg:grid size-8 place-items-center rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-950 active:scale-95 cursor-pointer transition-all"
-              title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-            >
-              {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-            </button>
-          </div>
-
-
-
-          {/* Navigation Items */}
-          <nav className="mt-5 space-y-4">
-            {groups.map((group, idx) => (
-              <div key={idx}>
-                {group.label && !isCollapsed && (
-                  <p className="px-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    {group.label}
-                  </p>
-                )}
-                {group.label && isCollapsed && (
-                  <div className="my-2 border-t border-slate-100" />
-                )}
-                <div className="mt-1 space-y-1">
-                  {group.items.map((item) => {
-                    const isActive = pathname === item.href;
-
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={handleNavClick}
-                        title={isCollapsed ? item.label : undefined}
-                        className={`flex items-center rounded-xl py-2.5 text-sm font-semibold transition-all duration-75 active:scale-95 cursor-pointer ${
-                          isCollapsed ? "justify-center px-0" : "justify-between px-3"
-                        } ${
-                          isActive
-                            ? "bg-crop/15 text-crop font-bold shadow-sm"
-                            : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <item.icon size={19} className={isActive ? "text-crop shrink-0" : "text-slate-400 shrink-0"} />
-                          {!isCollapsed && <span className="truncate">{item.label}</span>}
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </nav>
+          {/* Desktop Collapse / Expand Toggle Icon */}
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="hidden lg:grid size-8 place-items-center rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-950 active:scale-95 cursor-pointer transition-all"
+            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </button>
         </div>
 
-        {/* Footer Area: Compact User Profile Popover */}
-        <div className="relative border-t border-slate-200 pt-3 space-y-1">
+        {/* Scrollable Navigation Body */}
+        <nav className="flex-1 overflow-y-auto space-y-4 my-3 pr-0.5 scrollbar-none">
+          {groups.map((group, idx) => (
+            <div key={idx}>
+              {group.label && !isCollapsed && (
+                <p className="px-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  {group.label}
+                </p>
+              )}
+              {group.label && isCollapsed && (
+                <div className="my-2 border-t border-slate-100" />
+              )}
+              <div className="mt-1 space-y-1">
+                {group.items.map((item) => {
+                  const isActive = pathname === item.href;
 
-          {/* Profile Card & Popover */}
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={handleNavClick}
+                      title={isCollapsed ? item.label : undefined}
+                      className={`flex items-center rounded-xl py-2.5 text-sm font-semibold transition-all duration-75 active:scale-95 cursor-pointer ${
+                        isCollapsed ? "justify-center px-0" : "justify-between px-3"
+                      } ${
+                        isActive
+                          ? "bg-crop/15 text-crop font-bold shadow-sm"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <item.icon size={19} className={isActive ? "text-crop shrink-0" : "text-slate-400 shrink-0"} />
+                        {!isCollapsed && <span className="truncate">{item.label}</span>}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
+
+        {/* Fixed Bottom Footer Area (Profile Card & Popover) */}
+        <div className="relative shrink-0 border-t border-slate-200 pt-3">
           {user ? (
             <div className="relative">
               <button

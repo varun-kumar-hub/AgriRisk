@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AlertTriangle, ArrowRight, Sprout, Tractor, Sparkles } from "lucide-react";
 import { RiskTrendChart } from "@/components/charts/risk-trend-chart";
 import { CustomInputPanel } from "@/components/forms/custom-input-modal";
+import { TargetCropStatusBanner } from "@/components/crop-advisor/target-crop-banner";
 import { useUserInput } from "@/components/providers/user-input-provider";
 import { Card, CardTitle } from "@/components/ui/card";
 import { MetricCard } from "@/components/ui/metric";
@@ -76,6 +77,8 @@ export default function DashboardPage() {
       </header>
 
       <CustomInputPanel />
+
+      <TargetCropStatusBanner />
 
       <section className="mt-6 grid gap-4 md:grid-cols-2">
         <Link href="/crop-advisor" className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5 hover:bg-emerald-100/70 transition-all">

@@ -54,6 +54,57 @@ export const ALL_SUPPORTED_CROPS = [
   "mango", "banana", "papaya"
 ];
 
+export function getAgronomicConstraintReason(cropKey: string, inputs: CustomUserInputs): string[] {
+  const stats = getCropBenchmarkStats(cropKey);
+  const reasons: string[] = [];
+
+  const targetTemp = stats?.avgTempC || 25;
+  const targetPh = stats?.avgPh || 6.5;
+  const targetRain = stats?.avgRainfallMm || 800;
+  const targetN = stats?.avgNReq || 25;
+  const cropName = stats?.crop || cropKey;
+
+  // Temperature constraint
+  if (Math.abs(inputs.temperatureC - targetTemp) > 4) {
+    if (inputs.temperatureC > targetTemp) {
+      reasons.push(`Heat Stress: Field temp is ${inputs.temperatureC}°C (Optimal for ${cropName} is ${targetTemp}°C). High heat accelerates evapotranspiration & causes heat sterility.`);
+    } else {
+      reasons.push(`Cold Stress: Field temp is ${inputs.temperatureC}°C (Optimal for ${cropName} is ${targetTemp}°C). Slows germination & vegetative biomass.`);
+    }
+  }
+
+  // Soil pH constraint
+  if (Math.abs(inputs.soilPh - targetPh) > 0.8) {
+    if (inputs.soilPh > targetPh) {
+      reasons.push(`Alkaline Soil Stress: Soil pH is ${inputs.soilPh} (Optimal is ${targetPh}). High alkalinity inhibits Iron & Zinc micronutrient uptake.`);
+    } else {
+      reasons.push(`Acidic Soil Stress: Soil pH is ${inputs.soilPh} (Optimal is ${targetPh}). Causes Phosphorus fixation & aluminum root toxicity.`);
+    }
+  }
+
+  // Water & Rainfall constraint
+  if (cropKey === "rice" || cropKey === "sugarcane" || cropKey === "banana" || cropKey === "jute") {
+    if (inputs.waterAvailability === "Low" || inputs.rainfallMm < 700) {
+      reasons.push(`Moisture Deficit: ${cropName} requires high water supply (>800mm rain or canal irrigation), but field moisture is Low (${inputs.rainfallMm}mm rain).`);
+    }
+  } else if (cropKey === "chickpea" || cropKey === "pearl_millet" || cropKey === "mustard" || cropKey === "sesame") {
+    if (inputs.rainfallMm > 1000 || inputs.waterAvailability === "High") {
+      reasons.push(`Waterlogging / Rot Risk: ${cropName} suffers root rot & wilt under excessive rainfall (${inputs.rainfallMm}mm rain).`);
+    }
+  }
+
+  // Nitrogen deficit
+  if (inputs.nitrogen < targetN * 0.6) {
+    reasons.push(`Nitrogen Deficit: Soil N is ${inputs.nitrogen} kg/ha (Target demand for ${cropName} is ${targetN} kg/ha). Stunts leaf canopy growth.`);
+  }
+
+  if (reasons.length === 0) {
+    reasons.push(`Minor weather or soil nutrient variation from benchmark averages in ${inputs.distName}.`);
+  }
+
+  return reasons;
+}
+
 export function calculateDynamicCropRecommendations(inputs: CustomUserInputs): CropRecommendation[] {
   const evaluated = ALL_SUPPORTED_CROPS.map((cropKey) => {
     const stats = getCropBenchmarkStats(cropKey);
@@ -67,7 +118,7 @@ export function calculateDynamicCropRecommendations(inputs: CustomUserInputs): C
     const targetTemp = stats ? stats.avgTempC : 25;
     const targetRain = stats ? stats.avgRainfallMm : 800;
 
-    // 1. Soil pH Suitability (Penalize heavily for acidic/alkaline misalignment)
+    // 1. Soil pH Suitability
     const phDiff = Math.abs(inputs.soilPh - targetPh);
     const soilPhScore = Math.max(10, Math.min(100, Math.round(100 - phDiff * 32)));
 
@@ -77,7 +128,7 @@ export function calculateDynamicCropRecommendations(inputs: CustomUserInputs): C
     const kScore = Math.min(100, Math.round((inputs.potassium / Math.max(1, targetK)) * 100));
     const npkScore = Math.round((nScore * 0.45) + (pScore * 0.25) + (kScore * 0.30));
 
-    // Soil Type Affinity Bonuses
+    // Soil Type Affinity
     let soilTypeBonus = 0;
     if (cropKey === "cotton" && inputs.soilType.includes("Black")) soilTypeBonus = 18;
     if (cropKey === "groundnut" && inputs.soilType.includes("Red")) soilTypeBonus = 18;
@@ -90,21 +141,17 @@ export function calculateDynamicCropRecommendations(inputs: CustomUserInputs): C
     // 3. Water & Rainfall Requirements
     let waterScore = 70;
     if (cropKey === "rice" || cropKey === "sugarcane" || cropKey === "banana" || cropKey === "jute") {
-      // High water requirement crops
       if (inputs.waterAvailability === "High" || inputs.rainfallMm > 950) waterScore = 95;
       else if (inputs.waterAvailability === "Moderate" && inputs.rainfallMm > 650) waterScore = 70;
-      else waterScore = 20; // Severe penalty for low moisture
+      else waterScore = 20;
     } else if (cropKey === "pearl_millet" || cropKey === "sorghum" || cropKey === "chickpea" || cropKey === "sesame" || cropKey === "mustard") {
-      // Dryland / drought-tolerant crops
       if (inputs.waterAvailability === "Low" || inputs.rainfallMm < 650) waterScore = 95;
       else if (inputs.rainfallMm > 1100) waterScore = 40;
       else waterScore = 70;
     } else if (cropKey === "potato" || cropKey === "wheat" || cropKey === "garlic") {
-      // Cool rabi season crops
       if (inputs.temperatureC <= 22) waterScore = 90;
-      else waterScore = 50;
+      else waterScore = 45;
     } else {
-      // General crops
       if (inputs.rainfallMm >= 500 && inputs.rainfallMm <= 950) waterScore = 88;
       else waterScore = 60;
     }
@@ -139,6 +186,8 @@ export function calculateDynamicCropRecommendations(inputs: CustomUserInputs): C
     const estimatedProfit = expectedRevenue - productionCost;
     const riskAdjustedProfit = Math.round(estimatedProfit * (1 - riskScore / 150));
 
+    const constraintReasons = getAgronomicConstraintReason(cropKey, inputs);
+
     return {
       crop: displayName,
       decisionScore,
@@ -156,14 +205,28 @@ export function calculateDynamicCropRecommendations(inputs: CustomUserInputs): C
       estimatedProfit,
       riskAdjustedProfit,
       explanation: `${displayName} (${stats?.category || "Crop"}) scored ${decisionScore}/100 based on your custom soil pH (${inputs.soilPh}), N-P-K (${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}), temperature (${inputs.temperatureC}°C), and rainfall (${inputs.rainfallMm}mm) in ${inputs.distName}.`,
-      whyNot: decisionScore < 60
-        ? `High risk constraint for ${displayName} under current ${inputs.waterAvailability.toLowerCase()} water availability and temperature ${inputs.temperatureC}°C.`
-        : `Minor nutrient or weather fluctuation constraint.`
+      whyNot: constraintReasons.join(" ")
     };
   });
 
-  // Return top 6 best-fitting crops sorted by decisionScore descending
-  return evaluated.sort((a, b) => b.decisionScore - a.decisionScore).slice(0, 6);
+  // Sort all 28 crops by decisionScore descending
+  const sorted = evaluated.sort((a, b) => b.decisionScore - a.decisionScore);
+
+  // Take top 5 recommendations
+  const topList = sorted.slice(0, 5);
+
+  // Ensure target selected crop is ALWAYS present in recommendations list if selected by user
+  const selectedKeyNorm = (inputs.selectedCrop || "rice").toLowerCase().trim();
+  const selectedInTop = topList.some((item) => item.crop.toLowerCase().includes(selectedKeyNorm));
+
+  if (!selectedInTop) {
+    const selectedItem = sorted.find((item) => item.crop.toLowerCase().includes(selectedKeyNorm));
+    if (selectedItem) {
+      topList.push(selectedItem);
+    }
+  }
+
+  return topList;
 }
 
 export function getDynamicFarm(inputs: CustomUserInputs): Farm {
@@ -204,6 +267,8 @@ export function getDynamicCropRisk(inputs: CustomUserInputs): CropRisk {
   const recs = calculateDynamicCropRecommendations(inputs);
   const selectedRec = recs.find((r) => r.crop.toLowerCase().includes(inputs.selectedCrop.toLowerCase())) || recs[0];
 
+  const constraintReasons = getAgronomicConstraintReason(inputs.selectedCrop, inputs);
+
   return {
     overallScore: selectedRec.riskScore,
     level: selectedRec.riskLevel,
@@ -217,22 +282,13 @@ export function getDynamicCropRisk(inputs: CustomUserInputs): CropRisk {
       disease: 15,
       production: Math.round(100 - selectedRec.productionScore)
     },
-    factors: [
-      {
-        factor: "Soil Nutrient Status",
-        category: "soil",
-        severity: inputs.nitrogen < 15 ? "HIGH" : "MODERATE",
-        impact: 20,
-        description: `Current N-P-K (${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}) compared to crop demand.`
-      },
-      {
-        factor: "Irrigation Reliability",
-        category: "water",
-        severity: inputs.waterAvailability === "Low" ? "HIGH" : "LOW",
-        impact: 15,
-        description: `Water availability is recorded as ${inputs.waterAvailability}.`
-      }
-    ],
+    factors: constraintReasons.map((reason, idx) => ({
+      factor: `Agronomic Constraint #${idx + 1}`,
+      category: "soil",
+      severity: selectedRec.riskLevel === "LOW" ? "LOW" : selectedRec.riskLevel === "MODERATE" ? "MODERATE" : "HIGH",
+      impact: 20,
+      description: reason
+    })),
     updatedAt: new Date().toISOString()
   };
 }
