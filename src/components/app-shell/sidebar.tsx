@@ -14,7 +14,6 @@ import {
   Home,
   Lightbulb,
   LineChart,
-  Loader2,
   Map,
   Menu,
   Sprout,
@@ -24,49 +23,51 @@ import {
   LogOut
 } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
-
-const groups = [
-  { label: "Overview", items: [{ href: "/dashboard", label: "Dashboard", icon: Home }] },
-  {
-    label: "Before Planting",
-    items: [
-      { href: "/crop-advisor", label: "Crop Advisor", icon: Sprout },
-      { href: "/crop-advisor/compare", label: "Crop Comparison", icon: BarChart3 }
-    ]
-  },
-  {
-    label: "After Planting",
-    items: [
-      { href: "/farms", label: "My Farms", icon: Tractor },
-      { href: "/crop-health", label: "Crop Health", icon: Activity },
-      { href: "/alerts", label: "Alerts", icon: Bell }
-    ]
-  },
-  {
-    label: "Intelligence",
-    items: [
-      { href: "/recommendations", label: "Recommendations", icon: Lightbulb },
-      { href: "/risk", label: "Risk Intelligence", icon: LineChart },
-      { href: "/risk-map", label: "Regional Risk Map", icon: Map }
-    ]
-  },
-  {
-    label: "AI",
-    items: [
-      { href: "/copilot", label: "AI Copilot", icon: Bot },
-      { href: "/simulator", label: "Farm Simulator", icon: FlaskConical }
-    ]
-  }
-];
+import { useTranslation } from "@/lib/i18n/i18n-context";
+import { LanguageSelector } from "@/components/ui/language-selector";
 
 export function Sidebar() {
   const auth = useAuth();
   const user = auth?.user ?? null;
   const signOut = auth?.signOut ?? (async () => ({ error: null }));
   const pathname = usePathname();
+  const { t } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [navigatingHref, setNavigatingHref] = useState<string | null>(null);
+
+  const groups = [
+    { label: t("navigation.overview"), items: [{ href: "/dashboard", label: t("navigation.dashboard"), icon: Home }] },
+    {
+      label: t("navigation.beforePlanting"),
+      items: [
+        { href: "/crop-advisor", label: t("navigation.cropAdvisor"), icon: Sprout },
+        { href: "/crop-advisor/compare", label: t("navigation.cropComparison"), icon: BarChart3 }
+      ]
+    },
+    {
+      label: t("navigation.afterPlanting"),
+      items: [
+        { href: "/farms", label: t("navigation.myFarms"), icon: Tractor },
+        { href: "/crop-health", label: t("navigation.cropHealth"), icon: Activity },
+        { href: "/alerts", label: t("navigation.alerts"), icon: Bell }
+      ]
+    },
+    {
+      label: t("navigation.intelligence"),
+      items: [
+        { href: "/recommendations", label: t("navigation.recommendations"), icon: Lightbulb },
+        { href: "/risk", label: t("navigation.riskIntelligence"), icon: LineChart },
+        { href: "/risk-map", label: t("navigation.regionalRiskMap"), icon: Map }
+      ]
+    },
+    {
+      label: t("navigation.ai"),
+      items: [
+        { href: "/copilot", label: t("navigation.aiCopilot"), icon: Bot },
+        { href: "/simulator", label: t("navigation.farmSimulator"), icon: FlaskConical }
+      ]
+    }
+  ];
 
   const handleNavClick = () => {
     setMobileOpen(false);
@@ -83,13 +84,16 @@ export function Sidebar() {
           <span className="font-bold text-base text-slate-950">AgriRisk</span>
         </Link>
 
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="rounded-lg border border-slate-300 p-2 text-slate-700 hover:bg-slate-100 active:scale-95 cursor-pointer"
-          aria-label="Toggle navigation menu"
-        >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        <div className="flex items-center gap-2">
+          <LanguageSelector compact />
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="rounded-lg border border-slate-300 p-2 text-slate-700 hover:bg-slate-100 active:scale-95 cursor-pointer"
+            aria-label="Toggle navigation menu"
+          >
+            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </div>
 
       {/* Backdrop overlay for mobile drawer */}
@@ -120,7 +124,7 @@ export function Sidebar() {
               {!isCollapsed && (
                 <span className="animate-in fade-in duration-200">
                   <span className="block text-lg font-bold text-slate-950">AgriRisk</span>
-                  <span className="text-xs text-slate-500 font-medium">Decision intelligence</span>
+                  <span className="text-xs text-slate-500 font-medium">{t("common.tagline")}</span>
                 </span>
               )}
             </Link>
@@ -135,8 +139,17 @@ export function Sidebar() {
             </button>
           </div>
 
+          {/* Desktop Global Language Selector Bar */}
+          <div className="mt-4 px-1">
+            {isCollapsed ? (
+              <LanguageSelector compact />
+            ) : (
+              <LanguageSelector className="w-full" />
+            )}
+          </div>
+
           {/* Navigation Items */}
-          <nav className="mt-6 space-y-4">
+          <nav className="mt-5 space-y-4">
             {groups.map((group) => (
               <div key={group.label}>
                 {!isCollapsed ? (
@@ -191,7 +204,7 @@ export function Sidebar() {
                     onClick={() => signOut()}
                     className="text-[11px] font-semibold text-slate-400 hover:text-red-600 transition-colors flex items-center gap-1 mt-0.5"
                   >
-                    <LogOut size={12} /> Sign Out
+                    <LogOut size={12} /> {t("common.signOut")}
                   </button>
                 </div>
               )}
@@ -204,7 +217,7 @@ export function Sidebar() {
               }`}
             >
               <LogIn size={15} />
-              {!isCollapsed && <span>Sign In / Register</span>}
+              {!isCollapsed && <span>{t("common.signIn")}</span>}
             </Link>
           )}
         </div>
@@ -212,3 +225,4 @@ export function Sidebar() {
     </>
   );
 }
+

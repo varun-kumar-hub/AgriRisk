@@ -9,23 +9,28 @@ import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { RiskBadge } from "@/components/ui/risk-badge";
 import { formatCurrency } from "@/lib/scoring/risk";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export default function CropComparePage() {
   const { recommendations, inputs, updateInputs } = useUserInput();
   const toast = useToast();
+  const { t, getCropName } = useTranslation();
 
   const handleSelectCrop = (cropName: string) => {
     updateInputs({ selectedCrop: cropName.toLowerCase() });
-    toast.success(`Selected ${cropName}`, `Set ${cropName} as primary crop for farm testing profile.`);
+    toast.success(
+      t("cropComparison.cropSelectedToastTitle", { crop: getCropName(cropName) }),
+      t("cropComparison.cropSelectedToastDesc", { crop: getCropName(cropName) })
+    );
   };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <header>
-        <p className="text-sm font-semibold text-crop">Before planting intelligence</p>
-        <h1 className="mt-1 text-3xl font-bold text-slate-950">Crop Comparison Engine</h1>
+        <p className="text-sm font-semibold text-crop">{t("navigation.beforePlanting")}</p>
+        <h1 className="mt-1 text-3xl font-bold text-slate-950">{t("cropComparison.headerTitle")}</h1>
         <p className="mt-2 text-slate-600">
-          Compare crop options side-by-side by decision suitability, risk, yield, and risk-adjusted economic return.
+          {t("cropComparison.headerSubtitle")}
         </p>
       </header>
 
@@ -34,27 +39,27 @@ export default function CropComparePage() {
       <Card className="mt-6 border-2 border-crop/30 bg-white shadow-xl overflow-x-auto">
         <div className="flex items-center justify-between border-b pb-3">
           <div>
-            <CardTitle>Side-by-Side Crop Decision Matrix</CardTitle>
-            <p className="text-xs text-slate-500">Currently testing: <strong className="capitalize">{inputs.selectedCrop}</strong></p>
+            <CardTitle>{t("cropComparison.matrixTitle")}</CardTitle>
+            <p className="text-xs text-slate-500">{t("cropComparison.currentlyTesting", { crop: getCropName(inputs.selectedCrop) })}</p>
           </div>
           <span className="flex items-center gap-1.5 text-xs font-bold text-crop bg-crop/10 px-3 py-1 rounded-full">
-            <Sparkles size={14} /> 50,000+ Record Dataset
+            <Sparkles size={14} /> {t("cropComparison.datasetBadge")}
           </span>
         </div>
 
         <table className="mt-4 min-w-full text-left text-sm">
           <thead className="border-b text-slate-500 bg-slate-50">
             <tr>
-              <th className="py-3 px-4">Crop</th>
-              <th className="py-3 px-4">Decision Score</th>
-              <th className="py-3 px-4">Risk Level</th>
-              <th className="py-3 px-4">Soil Fit</th>
-              <th className="py-3 px-4">Climate Fit</th>
-              <th className="py-3 px-4">Water Fit</th>
-              <th className="py-3 px-4">Market Potential</th>
-              <th className="py-3 px-4">Expected Yield</th>
-              <th className="py-3 px-4">Risk-Adjusted Profit</th>
-              <th className="py-3 px-4 text-right">Action</th>
+              <th className="py-3 px-4">{t("cropComparison.thCrop")}</th>
+              <th className="py-3 px-4">{t("cropComparison.thDecisionScore")}</th>
+              <th className="py-3 px-4">{t("cropComparison.thRiskLevel")}</th>
+              <th className="py-3 px-4">{t("cropComparison.thSoilFit")}</th>
+              <th className="py-3 px-4">{t("cropComparison.thClimateFit")}</th>
+              <th className="py-3 px-4">{t("cropComparison.thWaterFit")}</th>
+              <th className="py-3 px-4">{t("cropComparison.thMarketPotential")}</th>
+              <th className="py-3 px-4">{t("cropComparison.thExpectedYield")}</th>
+              <th className="py-3 px-4">{t("cropComparison.thProfit")}</th>
+              <th className="py-3 px-4 text-right">{t("cropComparison.thAction")}</th>
             </tr>
           </thead>
           <tbody>
@@ -73,7 +78,7 @@ export default function CropComparePage() {
                       href={`/crop-advisor/${crop.crop.toLowerCase()}`}
                       className="font-bold text-slate-900 hover:text-crop hover:underline flex items-center gap-1.5"
                     >
-                      {crop.crop}
+                      {getCropName(crop.crop)}
                       {isSelected && <Check size={16} className="text-crop" />}
                     </Link>
                   </td>
@@ -88,11 +93,11 @@ export default function CropComparePage() {
                   <td className="py-4 px-4 text-right">
                     {isSelected ? (
                       <span className="inline-flex items-center gap-1 rounded-md bg-crop/20 px-3 py-1 text-xs font-bold text-crop">
-                        <Check size={14} /> Active
+                        <Check size={14} /> {t("cropComparison.activeBadge")}
                       </span>
                     ) : (
                       <Button size="sm" variant="outline" onClick={() => handleSelectCrop(crop.crop)}>
-                        Select Crop
+                        {t("cropComparison.selectCropBtn")}
                       </Button>
                     )}
                   </td>
@@ -105,3 +110,4 @@ export default function CropComparePage() {
     </div>
   );
 }
+

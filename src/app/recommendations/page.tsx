@@ -7,16 +7,20 @@ import { Card, CardTitle } from "@/components/ui/card";
 import { RiskBadge } from "@/components/ui/risk-badge";
 import { recommendations } from "@/lib/mock/data";
 import { formatCurrency } from "@/lib/scoring/risk";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export default function RecommendationsPage() {
   const { farm, inputs } = useUserInput();
+  const { t, getRiskLevelLabel } = useTranslation();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <header>
-        <p className="text-sm font-medium text-crop">Action intelligence</p>
-        <h1 className="mt-1 text-3xl font-bold">Recommendations for {farm.name}</h1>
-        <p className="mt-2 text-slate-600">Actions tied to your soil pH ({inputs.soilPh}), current water availability ({inputs.waterAvailability}), and risk profile.</p>
+        <p className="text-sm font-medium text-crop">{t("recommendations.actionIntelligence")}</p>
+        <h1 className="mt-1 text-3xl font-bold">{t("recommendations.headerTitle", { farm: farm.name })}</h1>
+        <p className="mt-2 text-slate-600">
+          {t("recommendations.headerSubtitle", { ph: inputs.soilPh, water: getRiskLevelLabel(inputs.waterAvailability) })}
+        </p>
       </header>
 
       <CustomInputPanel />
@@ -32,22 +36,29 @@ export default function RecommendationsPage() {
               <h2 className="mt-4 text-xl font-semibold">{item.title}</h2>
               <p className="mt-2 text-sm leading-6 text-slate-600">{item.reason}</p>
               <dl className="mt-5 space-y-2 text-sm">
-                <div className="flex justify-between"><dt className="text-slate-500">Cost</dt><dd className="font-semibold">{formatCurrency(item.estimatedCost)}</dd></div>
-                <div className="flex justify-between"><dt className="text-slate-500">Risk reduction</dt><dd className="font-semibold text-emerald-600">-{item.expectedRiskReduction}%</dd></div>
-                <div className="flex justify-between"><dt className="text-slate-500">Confidence</dt><dd className="font-semibold">{Math.round(item.confidence * 100)}%</dd></div>
+                <div className="flex justify-between"><dt className="text-slate-500">{t("recommendations.cost")}</dt><dd className="font-semibold">{formatCurrency(item.estimatedCost)}</dd></div>
+                <div className="flex justify-between"><dt className="text-slate-500">{t("recommendations.riskReduction")}</dt><dd className="font-semibold text-emerald-600">-{item.expectedRiskReduction}%</dd></div>
+                <div className="flex justify-between"><dt className="text-slate-500">{t("recommendations.confidence")}</dt><dd className="font-semibold">{Math.round(item.confidence * 100)}%</dd></div>
               </dl>
             </div>
             <Button className="mt-5 w-full">
-              Apply Recommendation
+              {t("recommendations.applyRecommendation")}
             </Button>
           </Card>
         ))}
       </section>
 
       <Card className="mt-6 overflow-x-auto">
-        <CardTitle>Intervention Benefit View</CardTitle>
+        <CardTitle>{t("recommendations.interventionBenefitView")}</CardTitle>
         <table className="mt-4 min-w-full text-left text-sm">
-          <thead className="border-b text-slate-500"><tr><th className="py-3">Action</th><th>Cost</th><th>Risk Drop</th><th>Benefit</th></tr></thead>
+          <thead className="border-b text-slate-500">
+            <tr>
+              <th className="py-3">{t("recommendations.thAction")}</th>
+              <th>{t("recommendations.thCost")}</th>
+              <th>{t("recommendations.thRiskDrop")}</th>
+              <th>{t("recommendations.thBenefit")}</th>
+            </tr>
+          </thead>
           <tbody>
             {recommendations.map((item) => (
               <tr key={item.id} className="border-b last:border-0">
@@ -63,4 +74,5 @@ export default function RecommendationsPage() {
     </div>
   );
 }
+
 

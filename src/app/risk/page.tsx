@@ -9,10 +9,12 @@ import { useUserInput } from "@/components/providers/user-input-provider";
 import { Card, CardTitle } from "@/components/ui/card";
 import { MetricCard } from "@/components/ui/metric";
 import { RiskBadge } from "@/components/ui/risk-badge";
-import { classifyRisk, formatCurrency } from "@/lib/scoring/risk";
+import { classifyRisk } from "@/lib/scoring/risk";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export default function RiskIntelligencePage() {
   const { farm, activeCropCycle, cropRisk, inputs } = useUserInput();
+  const { t, getCropName, getRiskLevelLabel } = useTranslation();
   const [activeTab, setActiveTab] = useState<"before" | "after">("before");
 
   // Dynamic Risk calculations based on user inputs
@@ -38,10 +40,10 @@ export default function RiskIntelligencePage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <header>
-        <p className="text-sm font-semibold text-risk">Central Decision Intelligence</p>
-        <h1 className="mt-1 text-3xl font-bold text-slate-950">Risk Intelligence Engine</h1>
+        <p className="text-sm font-semibold text-risk">{t("risk.centralIntelligence")}</p>
+        <h1 className="mt-1 text-3xl font-bold text-slate-950">{t("risk.title")}</h1>
         <p className="mt-2 text-slate-600">
-          Contextual risk analysis evaluated before planting (cultivation selection) and after planting (field monitoring).
+          {t("risk.subtitle")}
         </p>
       </header>
 
@@ -58,7 +60,7 @@ export default function RiskIntelligencePage() {
           }`}
         >
           <Sprout size={18} className={activeTab === "before" ? "text-emerald-400" : ""} />
-          BEFORE PLANTING — Crop & Cultivation Risk
+          {t("risk.beforePlantingTab")}
         </button>
 
         <button
@@ -70,7 +72,7 @@ export default function RiskIntelligencePage() {
           }`}
         >
           <LineChart size={18} className={activeTab === "after" ? "text-sky-400" : ""} />
-          AFTER PLANTING — Farm Field Risk
+          {t("risk.afterPlantingTab")}
         </button>
       </div>
 
@@ -78,18 +80,18 @@ export default function RiskIntelligencePage() {
       {activeTab === "before" && (
         <div className="mt-6 space-y-6">
           <section className="grid gap-4 md:grid-cols-3">
-            <MetricCard title="Overall Cultivation Risk" value={`${prePlantingRiskScore}/100`} detail={`Target Crop: ${inputs.selectedCrop.toUpperCase()}`}>
+            <MetricCard title={t("risk.overallCultivationRisk")} value={`${prePlantingRiskScore}/100`} detail={`${t("risk.targetCrop")}: ${getCropName(inputs.selectedCrop)}`}>
               <RiskBadge level={prePlantingRiskLevel} />
             </MetricCard>
-            <MetricCard title="Market Volatility" value={marketRisk > 60 ? "HIGH" : "MODERATE"} detail="Current market price uncertainty" />
-            <MetricCard title="Yield Suitability Fit" value={`${100 - yieldRisk}%`} detail={`Soil pH ${inputs.soilPh} | NPK ${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}`} />
+            <MetricCard title={t("risk.marketVolatility")} value={getRiskLevelLabel(marketRisk > 60 ? "HIGH" : "MODERATE")} detail={t("risk.marketUncertainty")} />
+            <MetricCard title={t("risk.yieldSuitabilityFit")} value={`${100 - yieldRisk}%`} detail={`Soil pH ${inputs.soilPh} | NPK ${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}`} />
           </section>
 
           <Card className="border-2 border-crop/30 bg-white shadow-lg">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
-                <CardTitle>Before Planting Cultivation Risk Breakdown</CardTitle>
-                <p className="text-xs text-slate-500">Answers: "If I plant {inputs.selectedCrop.toUpperCase()}, what risks am I taking?"</p>
+                <CardTitle>{t("risk.beforePlantingBreakdown")}</CardTitle>
+                <p className="text-xs text-slate-500">{t("risk.answersBeforePlanting", { crop: getCropName(inputs.selectedCrop) })}</p>
               </div>
               <RiskBadge level={prePlantingRiskLevel} />
             </div>
@@ -97,15 +99,15 @@ export default function RiskIntelligencePage() {
             <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="rounded-xl bg-slate-50 p-4 border border-slate-200">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><Sun size={15} className="text-amber-500" /> Weather Risk</span>
+                  <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><Sun size={15} className="text-amber-500" /> {t("risk.weatherRisk")}</span>
                   <span className="font-extrabold text-sm text-slate-900">{weatherRisk}/100</span>
                 </div>
-                <p className="mt-2 text-xs text-slate-600">Rainfall: {inputs.rainfallMm}mm | Temp: {inputs.temperatureC}°C</p>
+                <p className="mt-2 text-xs text-slate-600">{t("customInput.rainfall")}: {inputs.rainfallMm}mm | {t("customInput.temperature")}: {inputs.temperatureC}°C</p>
               </div>
 
               <div className="rounded-xl bg-slate-50 p-4 border border-slate-200">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><Sprout size={15} className="text-emerald-500" /> Soil Risk</span>
+                  <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><Sprout size={15} className="text-emerald-500" /> {t("risk.soilRisk")}</span>
                   <span className="font-extrabold text-sm text-slate-900">{soilRisk}/100</span>
                 </div>
                 <p className="mt-2 text-xs text-slate-600">Soil pH: {inputs.soilPh} | NPK: {inputs.nitrogen}-{inputs.phosphorus}-{inputs.potassium}</p>
@@ -113,15 +115,15 @@ export default function RiskIntelligencePage() {
 
               <div className="rounded-xl bg-slate-50 p-4 border border-slate-200">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><Droplets size={15} className="text-sky-500" /> Water Availability</span>
+                  <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><Droplets size={15} className="text-sky-500" /> {t("risk.waterAvailability")}</span>
                   <span className="font-extrabold text-sm text-slate-900">{waterRisk}/100</span>
                 </div>
-                <p className="mt-2 text-xs text-slate-600">Water Level: {inputs.waterAvailability}</p>
+                <p className="mt-2 text-xs text-slate-600">{t("customInput.waterAvailability")}: {getRiskLevelLabel(inputs.waterAvailability)}</p>
               </div>
 
               <div className="rounded-xl bg-slate-50 p-4 border border-slate-200">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><TrendingDown size={15} className="text-indigo-500" /> Market Price Risk</span>
+                  <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><TrendingDown size={15} className="text-indigo-500" /> {t("dashboard.overallRisk")}</span>
                   <span className="font-extrabold text-sm text-slate-900">{marketRisk}/100</span>
                 </div>
                 <p className="mt-2 text-xs text-slate-600">Mandies price fluctuation index</p>
@@ -146,8 +148,8 @@ export default function RiskIntelligencePage() {
           </Card>
 
           <section className="grid gap-4 xl:grid-cols-2">
-            <Card><CardTitle>Historical 7-Day Trend</CardTitle><RiskTrendChart /></Card>
-            <Card><CardTitle>Category Weighting</CardTitle><CategoryBars risk={cropRisk} /></Card>
+            <Card><CardTitle>{t("risk.historicalTrend")}</CardTitle><RiskTrendChart /></Card>
+            <Card><CardTitle>{t("risk.categoryWeighting")}</CardTitle><CategoryBars risk={cropRisk} /></Card>
           </section>
         </div>
       )}
@@ -156,18 +158,18 @@ export default function RiskIntelligencePage() {
       {activeTab === "after" && (
         <div className="mt-6 space-y-6">
           <section className="grid gap-4 md:grid-cols-3">
-            <MetricCard title="Active Farm Field Risk" value={`${farmRiskScore}/100`} detail={`Farm: ${farm.name}`}>
+            <MetricCard title="Active Farm Field Risk" value={`${farmRiskScore}/100`} detail={`${t("common.farm")}: ${farm.name}`}>
               <RiskBadge level={farmRiskLevel} />
             </MetricCard>
             <MetricCard title="Primary Field Threat" value={diseaseRisk > 70 ? "Fungal Leaf Blight" : "Water Stress"} detail="Immediate field monitoring required" />
-            <MetricCard title="Crop Vigour Index" value="78/100" detail={`Active Stage: ${activeCropCycle.stage}`} />
+            <MetricCard title={t("dashboard.cropHealthIndex")} value="78/100" detail={`${t("common.stage")}: ${activeCropCycle.stage}`} />
           </section>
 
           <Card className="border-2 border-sky-300 bg-white shadow-lg">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
-                <CardTitle>Active Farm Field Risk Monitor — {farm.name}</CardTitle>
-                <p className="text-xs text-slate-500">Answers: "What risks are developing in my farm field right now?"</p>
+                <CardTitle>{t("risk.afterPlantingBreakdown")} — {farm.name}</CardTitle>
+                <p className="text-xs text-slate-500">{t("risk.answersAfterPlanting", { crop: getCropName(inputs.selectedCrop) })}</p>
               </div>
               <RiskBadge level={farmRiskLevel} />
             </div>
@@ -194,7 +196,7 @@ export default function RiskIntelligencePage() {
                   <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><Droplets size={15} className="text-blue-500" /> Water Stress</span>
                   <span className="font-extrabold text-sm text-slate-900">{waterStressRisk}/100</span>
                 </div>
-                <p className="mt-2 text-xs text-slate-600">Availability: {inputs.waterAvailability}</p>
+                <p className="mt-2 text-xs text-slate-600">{t("customInput.waterAvailability")}: {getRiskLevelLabel(inputs.waterAvailability)}</p>
               </div>
 
               <div className="rounded-xl bg-slate-50 p-4 border border-slate-200">
@@ -234,3 +236,4 @@ export default function RiskIntelligencePage() {
     </div>
   );
 }
+

@@ -5,6 +5,8 @@ import { AuthGuard } from "@/components/auth/auth-guard";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { ToastProvider } from "@/components/providers/toast-provider";
 import { UserInputProvider } from "@/components/providers/user-input-provider";
+import { LanguageProvider } from "@/lib/i18n/i18n-context";
+import { LanguageOnboardingModal } from "@/components/auth/language-onboarding";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -21,15 +23,18 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
-        <AuthProvider>
-          <AuthGuard>
-            <ToastProvider>
-              <UserInputProvider>
-                <AppShell>{children}</AppShell>
-              </UserInputProvider>
-            </ToastProvider>
-          </AuthGuard>
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <AuthGuard>
+              <ToastProvider>
+                <UserInputProvider>
+                  <LanguageOnboardingModal />
+                  <AppShell>{children}</AppShell>
+                </UserInputProvider>
+              </ToastProvider>
+            </AuthGuard>
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

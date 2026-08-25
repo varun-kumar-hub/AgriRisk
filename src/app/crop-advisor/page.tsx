@@ -11,22 +11,24 @@ import { ApiProgressStepper, ProgressStep } from "@/components/ui/api-progress-s
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { getCropBenchmarkStats, getHistoricalYieldTrends } from "@/lib/data/historical-dataset";
-
-const ANALYSIS_STEPS: ProgressStep[] = [
-  { id: "1", label: "Farm location identified & geocoded" },
-  { id: "2", label: "Soil test profile & N-P-K levels loaded" },
-  { id: "3", label: "Historical 50,000+ crop records retrieved" },
-  { id: "4", label: "Analyzing crop suitability fit & water demand" },
-  { id: "5", label: "Calculating risk index & market return" }
-];
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export default function CropAdvisorPage() {
   const { farm, recommendations, inputs } = useUserInput();
   const toast = useToast();
+  const { t, getRiskLevelLabel } = useTranslation();
 
   const [analyzing, setAnalyzing] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [progressPercent, setProgressPercent] = useState(0);
+
+  const ANALYSIS_STEPS: ProgressStep[] = [
+    { id: "1", label: t("cropAdvisor.step1") },
+    { id: "2", label: t("cropAdvisor.step2") },
+    { id: "3", label: t("cropAdvisor.step3") },
+    { id: "4", label: t("cropAdvisor.step4") },
+    { id: "5", label: t("cropAdvisor.step5") }
+  ];
 
   const stats = getCropBenchmarkStats(inputs.selectedCrop);
   const trends = getHistoricalYieldTrends(inputs.selectedCrop);
@@ -35,7 +37,7 @@ export default function CropAdvisorPage() {
     setAnalyzing(true);
     setCurrentStepIndex(0);
     setProgressPercent(15);
-    toast.info("Analyzing farm conditions...", "Loading soil, climate, and historical dataset records.");
+    toast.info(t("cropAdvisor.analyzingToastTitle"), t("cropAdvisor.analyzingToastDesc"));
 
     const stepInterval = setInterval(() => {
       setCurrentStepIndex((prev) => {
@@ -46,7 +48,7 @@ export default function CropAdvisorPage() {
           clearInterval(stepInterval);
           setTimeout(() => {
             setAnalyzing(false);
-            toast.success("Crop Suitability Analysis Complete", "Recommendations updated based on live farm inputs.");
+            toast.success(t("cropAdvisor.completeToastTitle"), t("cropAdvisor.completeToastDesc"));
           }, 400);
         }
         return next;
@@ -58,15 +60,15 @@ export default function CropAdvisorPage() {
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-semibold text-crop">Before planting intelligence</p>
-          <h1 className="mt-1 text-3xl font-bold text-slate-950">Crop Advisor</h1>
+          <p className="text-sm font-semibold text-crop">{t("navigation.beforePlanting")}</p>
+          <h1 className="mt-1 text-3xl font-bold text-slate-950">{t("cropAdvisor.title")}</h1>
           <p className="mt-1 max-w-3xl text-slate-600">
-            AgriRisk evaluates your soil, water, season, weather, market, yield, and economic context to answer what you should grow.
+            {t("cropAdvisor.headerSubtitle")}
           </p>
         </div>
 
         <Button onClick={handleRunAnalysis} loading={analyzing}>
-          <RefreshCw size={16} /> Re-Analyze Farm
+          <RefreshCw size={16} /> {t("cropAdvisor.reAnalyzeFarm")}
         </Button>
       </header>
 
@@ -86,25 +88,25 @@ export default function CropAdvisorPage() {
       <section className="mt-6 grid gap-4 lg:grid-cols-[0.9fr_2fr]">
         <Card className="border border-slate-200">
           <div className="flex items-center justify-between border-b pb-3">
-            <CardTitle>Farm Inputs Context</CardTitle>
+            <CardTitle>{t("cropAdvisor.inputsContext")}</CardTitle>
             <span className="text-xs font-bold text-crop bg-crop/10 px-2.5 py-1 rounded-full">
-              Live Profile
+              {t("cropAdvisor.liveProfile")}
             </span>
           </div>
 
           <dl className="mt-4 space-y-3 text-sm">
-            <div className="flex justify-between gap-4"><dt className="text-slate-500">Farm Name</dt><dd className="font-semibold">{farm.name}</dd></div>
-            <div className="flex justify-between gap-4"><dt className="text-slate-500">Location</dt><dd className="font-semibold">{farm.location}</dd></div>
-            <div className="flex justify-between gap-4"><dt className="text-slate-500">Area</dt><dd className="font-semibold">{farm.areaAcres} acres</dd></div>
-            <div className="flex justify-between gap-4"><dt className="text-slate-500">Soil pH / Type</dt><dd className="font-semibold">{inputs.soilPh} / {farm.soilType}</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-slate-500">{t("customInput.farmName")}</dt><dd className="font-semibold">{farm.name}</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-slate-500">{t("common.location")}</dt><dd className="font-semibold">{farm.location}</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-slate-500">{t("common.area")}</dt><dd className="font-semibold">{farm.areaAcres} {t("farms.acres")}</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-slate-500">{t("farms.soilPh")}</dt><dd className="font-semibold">{inputs.soilPh} / {farm.soilType}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-slate-500">Soil N-P-K</dt><dd className="font-semibold">{inputs.nitrogen}-{inputs.phosphorus}-{inputs.potassium} kg/ha</dd></div>
-            <div className="flex justify-between gap-4"><dt className="text-slate-500">Water Level</dt><dd className="font-semibold">{inputs.waterAvailability}</dd></div>
-            <div className="flex justify-between gap-4"><dt className="text-slate-500">Temp / Rain</dt><dd className="font-semibold">{inputs.temperatureC}°C / {inputs.rainfallMm}mm</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-slate-500">{t("customInput.waterAvailability")}</dt><dd className="font-semibold">{getRiskLevelLabel(inputs.waterAvailability)}</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-slate-500">{t("common.temp")} / {t("common.rain")}</dt><dd className="font-semibold">{inputs.temperatureC}°C / {inputs.rainfallMm}mm</dd></div>
           </dl>
 
           <div className="mt-5 rounded-xl bg-slate-50 p-4 border border-slate-200 text-xs text-slate-600 flex items-center gap-2">
             <Sparkles className="text-crop shrink-0" size={18} />
-            <span>Powered by 50,000+ historical crop yield and climate records across India.</span>
+            <span>{t("cropAdvisor.poweredBy50k")}</span>
           </div>
         </Card>
 
@@ -119,3 +121,4 @@ export default function CropAdvisorPage() {
     </div>
   );
 }
+

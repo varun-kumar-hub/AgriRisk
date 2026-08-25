@@ -9,9 +9,11 @@ import { Card, CardTitle } from "@/components/ui/card";
 import { MetricCard } from "@/components/ui/metric";
 import { RiskBadge } from "@/components/ui/risk-badge";
 import { classifyRisk, formatCurrency } from "@/lib/scoring/risk";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export default function SimulatorPage() {
   const { farm, cropRisk, recommendations, inputs } = useUserInput();
+  const { t, getCropName, getRiskLevelLabel } = useTranslation();
 
   const [rainfallChange, setRainfallChange] = useState(-20); // -20%
   const [tempChange, setTempChange] = useState(2); // +2 °C
@@ -50,10 +52,10 @@ export default function SimulatorPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <header>
-        <p className="text-sm font-medium text-water">What-if decision intelligence</p>
-        <h1 className="mt-1 text-3xl font-bold">Interactive Farm Simulator</h1>
+        <p className="text-sm font-medium text-water">{t("simulator.category")}</p>
+        <h1 className="mt-1 text-3xl font-bold">{t("simulator.title")}</h1>
         <p className="mt-2 text-slate-600">
-          Simulate weather stress, climate anomalies, and irrigation interventions to model real-time risk & economic impacts.
+          {t("simulator.subtitle")}
         </p>
       </header>
 
@@ -61,12 +63,12 @@ export default function SimulatorPage() {
 
       {/* Simulator Key Metrics */}
       <section className="mt-6 grid gap-4 md:grid-cols-4">
-        <MetricCard title="Baseline Risk" value={`${baselineRisk}/100`} detail="Current farm inputs" />
-        <MetricCard title="Simulated Risk" value={`${simulatedRisk}/100`} detail={`Under ${tempChange >= 0 ? `+${tempChange}` : tempChange}°C / ${rainfallChange}% rain`}>
+        <MetricCard title={t("simulator.baselineRisk")} value={`${baselineRisk}/100`} detail={t("simulator.currentInputs")} />
+        <MetricCard title={t("simulator.simulatedRisk")} value={`${simulatedRisk}/100`} detail={`Under ${tempChange >= 0 ? `+${tempChange}` : tempChange}°C / ${rainfallChange}% rain`}>
           <RiskBadge level={simulatedLevel} />
         </MetricCard>
-        <MetricCard title="Yield Impact" value={`${baselineYield} → ${simulatedYield}`} detail="t/ha estimated" />
-        <MetricCard title="Potential Loss" value={formatCurrency(totalPotentialLoss)} detail={`For ${farm.areaAcres} acres`} />
+        <MetricCard title={t("simulator.yieldImpact")} value={`${baselineYield} → ${simulatedYield}`} detail={t("simulator.estimated")} />
+        <MetricCard title={t("simulator.potentialLoss")} value={formatCurrency(totalPotentialLoss)} detail={t("simulator.forAcres", { acres: farm.areaAcres })} />
       </section>
 
       {/* Interactive Controls & Scenario Analysis */}
@@ -74,17 +76,17 @@ export default function SimulatorPage() {
         <Card className="border-2 border-slate-200 shadow-md">
           <div className="flex items-center justify-between border-b pb-3">
             <CardTitle className="flex items-center gap-2">
-              <Sliders size={18} className="text-crop" /> Scenario Controls
+              <Sliders size={18} className="text-crop" /> {t("simulator.scenarioControls")}
             </CardTitle>
             <Button variant="ghost" size="sm" onClick={handleReset}>
-              <RotateCcw size={14} /> Reset
+              <RotateCcw size={14} /> {t("simulator.reset")}
             </Button>
           </div>
 
           <div className="mt-5 space-y-6">
             <div>
               <div className="flex justify-between text-sm font-semibold">
-                <span>Rainfall Delta (%)</span>
+                <span>{t("simulator.rainfallDelta")}</span>
                 <span className={rainfallChange < 0 ? "text-red-600 font-bold" : "text-emerald-600 font-bold"}>
                   {rainfallChange > 0 ? `+${rainfallChange}` : rainfallChange}%
                 </span>
@@ -99,15 +101,15 @@ export default function SimulatorPage() {
                 className="mt-2 w-full accent-crop cursor-pointer"
               />
               <div className="flex justify-between text-[11px] text-slate-400">
-                <span>-50% Drought</span>
-                <span>Normal (0%)</span>
-                <span>+50% Heavy Rain</span>
+                <span>{t("simulator.droughtLabel")}</span>
+                <span>{t("simulator.normalLabel")}</span>
+                <span>{t("simulator.heavyRainLabel")}</span>
               </div>
             </div>
 
             <div>
               <div className="flex justify-between text-sm font-semibold">
-                <span>Temperature Anomaly (°C)</span>
+                <span>{t("simulator.tempAnomaly")}</span>
                 <span className={tempChange > 0 ? "text-red-600 font-bold" : "text-emerald-600 font-bold"}>
                   {tempChange > 0 ? `+${tempChange}` : tempChange} °C
                 </span>
@@ -122,15 +124,15 @@ export default function SimulatorPage() {
                 className="mt-2 w-full accent-crop cursor-pointer"
               />
               <div className="flex justify-between text-[11px] text-slate-400">
-                <span>-5°C Cooler</span>
-                <span>Normal (0°C)</span>
-                <span>+8°C Heatwave</span>
+                <span>{t("simulator.coolerLabel")}</span>
+                <span>{t("simulator.normalLabel")}</span>
+                <span>{t("simulator.heatwaveLabel")}</span>
               </div>
             </div>
 
             <div>
               <div className="flex justify-between text-sm font-semibold">
-                <span>Irrigation Boost (%)</span>
+                <span>{t("simulator.irrigationBoost")}</span>
                 <span className="text-emerald-600 font-bold">+{irrigationBoost}%</span>
               </div>
               <input
@@ -143,14 +145,14 @@ export default function SimulatorPage() {
                 className="mt-2 w-full accent-crop cursor-pointer"
               />
               <div className="flex justify-between text-[11px] text-slate-400">
-                <span>0% Standard</span>
-                <span>+25% Extra Watering</span>
-                <span>+50% Drip Irrigation</span>
+                <span>{t("simulator.standardLabel")}</span>
+                <span>{t("simulator.extraWatering")}</span>
+                <span>{t("simulator.dripIrrigation")}</span>
               </div>
             </div>
 
             <Button onClick={handleSimulate} loading={loading} className="w-full">
-              <Play size={16} /> Run What-If Simulation
+              <Play size={16} /> {t("simulator.runSimulationBtn")}
             </Button>
           </div>
         </Card>
@@ -158,34 +160,44 @@ export default function SimulatorPage() {
         {/* Simulation Output Card */}
         <Card className="border-2 border-crop/30 bg-white shadow-xl flex flex-col justify-between">
           <div>
-            <CardTitle>Simulation Intelligence & Risk Breakdown</CardTitle>
+            <CardTitle>{t("simulator.simulationIntelligence")}</CardTitle>
 
             <div className="mt-4 rounded-xl bg-slate-50 p-4 border border-slate-100 space-y-3">
               <p className="text-base leading-7 text-slate-800">
-                Simulating a <strong>{rainfallChange}% rainfall change</strong> and a <strong>+{tempChange}°C temperature change</strong> for{" "}
-                <strong className="capitalize">{inputs.selectedCrop}</strong> increases agricultural risk from <strong>{baselineRisk}/100</strong> to{" "}
-                <strong>{simulatedRisk}/100</strong> ({simulatedLevel}).
+                {t("simulator.simDesc", {
+                  rain: rainfallChange,
+                  temp: tempChange,
+                  crop: getCropName(inputs.selectedCrop),
+                  base: baselineRisk,
+                  sim: simulatedRisk,
+                  level: getRiskLevelLabel(simulatedLevel)
+                })}
               </p>
               <p className="text-sm text-slate-600">
-                Expected yield per hectare changes from {baselineYield} t/ha to {simulatedYield} t/ha, resulting in an estimated revenue impact of{" "}
-                <strong>{formatCurrency(totalPotentialLoss)}</strong> across your {farm.areaAcres} acre farm.
+                {t("simulator.yieldDesc", {
+                  baseYield: baselineYield,
+                  simYield: simulatedYield,
+                  loss: formatCurrency(totalPotentialLoss),
+                  acres: farm.areaAcres
+                })}
               </p>
             </div>
 
             <div className="mt-5 rounded-xl bg-emerald-50 p-4 border border-emerald-100">
-              <p className="font-bold text-emerald-950 text-sm">Recommended Intervention:</p>
+              <p className="font-bold text-emerald-950 text-sm">{t("simulator.recommendedIntervention")}</p>
               <p className="mt-1 text-xs text-emerald-800 leading-5">
-                Applying a +{irrigationBoost}% irrigation boost reduces risk impact by {irrigationMitigation} points. Inspect soil moisture every 48 hours to protect tillering during the Vegetative stage.
+                {t("simulator.interventionDesc", { boost: irrigationBoost, mitigation: irrigationMitigation })}
               </p>
             </div>
           </div>
 
           <div className="mt-6 border-t pt-4 text-xs text-slate-500 flex justify-between items-center">
-            <span>Powered by AgriRisk What-If Decision Engine</span>
-            <span className="font-bold text-slate-700">Crop: {inputs.selectedCrop.toUpperCase()}</span>
+            <span>{t("simulator.engineFooter")}</span>
+            <span className="font-bold text-slate-700">{t("common.crop")}: {getCropName(inputs.selectedCrop)}</span>
           </div>
         </Card>
       </section>
     </div>
   );
 }
+
