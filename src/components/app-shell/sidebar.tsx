@@ -8,23 +8,29 @@ import {
   BarChart3,
   Bell,
   Bot,
+  CalendarSync,
   ChevronLeft,
   ChevronRight,
+  CloudSun,
   FlaskConical,
   Home,
   Lightbulb,
   LineChart,
   Map,
   Menu,
+  Settings,
   Sprout,
   Tractor,
+  TrendingUp,
   X,
   LogIn,
-  LogOut
+  ChevronUp
 } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useTranslation } from "@/lib/i18n/i18n-context";
 import { LanguageSelector } from "@/components/ui/language-selector";
+import { ProfilePopover } from "@/components/app-shell/profile-popover";
+import { SignOutModal } from "@/components/modals/signout-modal";
 
 export function Sidebar() {
   const auth = useAuth();
@@ -35,35 +41,39 @@ export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [signOutModalOpen, setSignOutModalOpen] = useState(false);
+
   const groups = [
     {
-      label: t("navigation.overview"),
-      items: [
-        { href: "/dashboard", label: t("navigation.dashboard"), icon: Home }
-      ]
+      label: null,
+      items: [{ href: "/dashboard", label: t("navigation.dashboard"), icon: Home }]
     },
     {
-      label: t("navigation.cropPlanning"),
+      label: t("navigation.cropSelection"),
       items: [
         { href: "/crop-advisor", label: t("navigation.cropAdvisor"), icon: Sprout },
-        { href: "/crop-advisor/compare", label: t("navigation.cropComparison"), icon: BarChart3 },
-        { href: "/simulator", label: t("navigation.farmSimulator"), icon: FlaskConical }
+        { href: "/crop-advisor/compare", label: t("navigation.cropComparison"), icon: BarChart3 }
       ]
     },
     {
-      label: t("navigation.fieldMonitoring"),
+      label: t("navigation.cropManagement"),
       items: [
         { href: "/farms", label: t("navigation.myFarms"), icon: Tractor },
         { href: "/crop-health", label: t("navigation.cropHealth"), icon: Activity },
+        { href: "/crop-lifecycle", label: t("navigation.cropLifecycle"), icon: CalendarSync },
         { href: "/alerts", label: t("navigation.alerts"), icon: Bell }
       ]
     },
     {
-      label: t("navigation.riskIntelligenceSection"),
+      label: t("navigation.agriIntelligence"),
       items: [
         { href: "/recommendations", label: t("navigation.recommendations"), icon: Lightbulb },
         { href: "/risk", label: t("navigation.riskIntelligence"), icon: LineChart },
-        { href: "/risk-map", label: t("navigation.regionalRiskMap"), icon: Map }
+        { href: "/simulator", label: t("navigation.farmSimulator"), icon: FlaskConical },
+        { href: "/risk-map", label: t("navigation.regionalRiskMap"), icon: Map },
+        { href: "/intelligence/market", label: t("navigation.marketIntelligence"), icon: TrendingUp },
+        { href: "/intelligence/climate", label: t("navigation.climateIntelligence"), icon: CloudSun }
       ]
     },
     {
@@ -74,9 +84,13 @@ export function Sidebar() {
     }
   ];
 
-
   const handleNavClick = () => {
     setMobileOpen(false);
+  };
+
+  const handleConfirmSignOut = async () => {
+    setSignOutModalOpen(false);
+    await signOut();
   };
 
   return (
@@ -156,16 +170,17 @@ export function Sidebar() {
 
           {/* Navigation Items */}
           <nav className="mt-5 space-y-4">
-            {groups.map((group) => (
-              <div key={group.label}>
-                {!isCollapsed ? (
+            {groups.map((group, idx) => (
+              <div key={idx}>
+                {group.label && !isCollapsed && (
                   <p className="px-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
                     {group.label}
                   </p>
-                ) : (
+                )}
+                {group.label && isCollapsed && (
                   <div className="my-2 border-t border-slate-100" />
                 )}
-                <div className="mt-1.5 space-y-1">
+                <div className="mt-1 space-y-1">
                   {group.items.map((item) => {
                     const isActive = pathname === item.href;
 
@@ -196,24 +211,58 @@ export function Sidebar() {
           </nav>
         </div>
 
-        {/* Auth User Profile Footer */}
-        <div className="border-t border-slate-100 pt-3">
+        {/* Footer Area: Settings + Compact User Profile Popover */}
+        <div className="relative border-t border-slate-200 pt-3 space-y-1">
+          {/* Settings Nav Item */}
+          <Link
+            href="/settings"
+            onClick={handleNavClick}
+            title={isCollapsed ? t("navigation.settings") : undefined}
+            className={`flex items-center rounded-xl py-2.5 text-sm font-semibold transition-all duration-75 active:scale-95 cursor-pointer ${
+              isCollapsed ? "justify-center px-0" : "justify-between px-3"
+            } ${
+              pathname.startsWith("/settings")
+                ? "bg-crop/15 text-crop font-bold shadow-sm"
+                : "text-slate-700 hover:bg-slate-100 hover:text-slate-950"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <Settings size={19} className={pathname.startsWith("/settings") ? "text-crop shrink-0" : "text-slate-500 shrink-0"} />
+              {!isCollapsed && <span className="truncate">{t("navigation.settings")}</span>}
+            </div>
+          </Link>
+
+          {/* Profile Card & Popover */}
           {user ? (
-            <div className={`flex items-center gap-2 ${isCollapsed ? "justify-center" : "px-2"}`}>
-              <div className="size-8 rounded-full bg-crop text-white font-bold grid place-items-center text-xs shadow-sm uppercase shrink-0">
-                {user.email?.[0] || "U"}
-              </div>
-              {!isCollapsed && (
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-slate-900 truncate">{user.email}</p>
-                  <button
-                    onClick={() => signOut()}
-                    className="text-[11px] font-semibold text-slate-400 hover:text-red-600 transition-colors flex items-center gap-1 mt-0.5"
-                  >
-                    <LogOut size={12} /> {t("common.signOut")}
-                  </button>
+            <div className="relative">
+              <button
+                onClick={() => setPopoverOpen(!popoverOpen)}
+                className={`flex w-full items-center gap-3 rounded-2xl p-2 transition-all hover:bg-slate-100 active:scale-95 cursor-pointer text-left ${
+                  isCollapsed ? "justify-center" : "justify-between"
+                }`}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="size-9 rounded-xl bg-crop text-white font-bold grid place-items-center text-sm shadow-sm uppercase shrink-0">
+                    {user.email?.[0] || "U"}
+                  </div>
+                  {!isCollapsed && (
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-slate-900 truncate">
+                        {user.email?.split("@")[0] || "Farmer"}
+                      </p>
+                      <p className="text-xs text-slate-500 font-medium truncate">Farmer</p>
+                    </div>
+                  )}
                 </div>
-              )}
+                {!isCollapsed && <ChevronUp size={16} className="text-slate-400 shrink-0" />}
+              </button>
+
+              <ProfilePopover
+                isOpen={popoverOpen}
+                onClose={() => setPopoverOpen(false)}
+                onSignOut={() => setSignOutModalOpen(true)}
+                userEmail={user.email}
+              />
             </div>
           ) : (
             <Link
@@ -228,7 +277,12 @@ export function Sidebar() {
           )}
         </div>
       </aside>
+
+      <SignOutModal
+        isOpen={signOutModalOpen}
+        onClose={() => setSignOutModalOpen(false)}
+        onConfirm={handleConfirmSignOut}
+      />
     </>
   );
 }
-
