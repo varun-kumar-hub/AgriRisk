@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, startTransition } from "react";
+import { useAuth } from "@/components/providers/auth-provider";
 import { defaultUserInputs, CustomUserInputs, calculateDynamicCropRecommendations, getDynamicFarm, getDynamicCropCycle, getDynamicCropRisk } from "@/lib/data/store";
 import type { Farm, CropRecommendation, CropCycle, CropRisk } from "@/types/domain";
 
@@ -17,25 +18,40 @@ interface UserInputContextType {
 const UserInputContext = createContext<UserInputContextType | null>(null);
 
 export function UserInputProvider({ children }: { children: React.ReactNode }) {
-  const [inputs, setInputs] = useState<CustomUserInputs>(defaultUserInputs);
+  const { user } = useAuth();
+  const userId = user?.id || "guest";
+  const storageKey = `agririsk_inputs_${userId}`;
 
+  const [inputs, setInputs] = useState<CustomUserInputs>(() => {
+    return {
+      ...defaultUserInputs,
+      farmName: user?.email ? `${user.email.split("@")[0]}'s Farm` : defaultUserInputs.farmName
+    };
+  });
+
+  // Re-load user-isolated inputs whenever user changes
   useEffect(() => {
-    const saved = localStorage.getItem("agririsk_custom_inputs");
+    const saved = localStorage.getItem(storageKey);
     if (saved) {
       try {
-        setInputs((prev) => ({ ...prev, ...JSON.parse(saved) }));
+        setInputs({ ...defaultUserInputs, ...JSON.parse(saved) });
       } catch (e) {
-        console.error("Failed to parse saved inputs:", e);
+        console.error("Failed to parse user isolated inputs:", e);
       }
+    } else if (user?.email) {
+      setInputs({
+        ...defaultUserInputs,
+        farmName: `${user.email.split("@")[0]}'s Farm`
+      });
     }
-  }, []);
+  }, [userId, user?.email, storageKey]);
 
   const updateInputs = (newInputs: Partial<CustomUserInputs>) => {
     startTransition(() => {
       setInputs((prev) => {
         const updated = { ...prev, ...newInputs };
         try {
-          localStorage.setItem("agririsk_custom_inputs", JSON.stringify(updated));
+          localStorage.setItem(storageKey, JSON.stringify(updated));
         } catch (e) {}
         return updated;
       });
@@ -44,8 +60,12 @@ export function UserInputProvider({ children }: { children: React.ReactNode }) {
 
   const resetInputs = () => {
     startTransition(() => {
-      setInputs(defaultUserInputs);
-      localStorage.removeItem("agririsk_custom_inputs");
+      const resetState = {
+        ...defaultUserInputs,
+        farmName: user?.email ? `${user.email.split("@")[0]}'s Farm` : defaultUserInputs.farmName
+      };
+      setInputs(resetState);
+      localStorage.removeItem(storageKey);
     });
   };
 
