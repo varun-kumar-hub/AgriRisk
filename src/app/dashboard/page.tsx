@@ -142,7 +142,7 @@ export default function DashboardPage() {
             {recommendations.slice(0, 3).map((item, idx) => (
               <div key={item.crop || idx} className="rounded-xl bg-slate-50 p-3 border border-slate-200">
                 <p className="font-bold text-slate-900 text-sm">Grow {getCropName(item.crop)} ({item.expectedYield} t/ha)</p>
-                <p className="text-xs text-slate-600 mt-1">{item.agronomicReasoning || item.explanation}</p>
+                <p className="text-xs text-slate-600 mt-1">{item.explanation}</p>
               </div>
             ))}
           </div>
