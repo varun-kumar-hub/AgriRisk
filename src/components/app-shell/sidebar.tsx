@@ -149,15 +149,14 @@ export function Sidebar() {
                 <div className="mt-1.5 space-y-1">
                   {group.items.map((item) => {
                     const isActive = pathname === item.href;
-                    const isNavigating = navigatingHref === item.href;
 
                     return (
                       <Link
                         key={item.href}
                         href={item.href}
-                        onClick={() => handleNavClick(item.href)}
+                        onClick={handleNavClick}
                         title={isCollapsed ? item.label : undefined}
-                        className={`flex items-center rounded-xl py-2.5 text-sm font-semibold transition-all duration-150 active:scale-95 cursor-pointer ${
+                        className={`flex items-center rounded-xl py-2.5 text-sm font-semibold transition-all duration-75 active:scale-95 cursor-pointer ${
                           isCollapsed ? "justify-center px-0" : "justify-between px-3"
                         } ${
                           isActive
@@ -169,9 +168,6 @@ export function Sidebar() {
                           <item.icon size={19} className={isActive ? "text-crop shrink-0" : "text-slate-400 shrink-0"} />
                           {!isCollapsed && <span className="truncate">{item.label}</span>}
                         </div>
-                        {!isCollapsed && isNavigating && (
-                          <Loader2 size={14} className="animate-spin text-crop shrink-0" />
-                        )}
                       </Link>
                     );
                   })}

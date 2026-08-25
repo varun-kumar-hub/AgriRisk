@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, startTransition } from "react";
 import { defaultUserInputs, CustomUserInputs, calculateDynamicCropRecommendations, getDynamicFarm, getDynamicCropCycle, getDynamicCropRisk } from "@/lib/data/store";
 import type { Farm, CropRecommendation, CropCycle, CropRisk } from "@/types/domain";
 
@@ -31,22 +31,28 @@ export function UserInputProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const updateInputs = (newInputs: Partial<CustomUserInputs>) => {
-    setInputs((prev) => {
-      const updated = { ...prev, ...newInputs };
-      localStorage.setItem("agririsk_custom_inputs", JSON.stringify(updated));
-      return updated;
+    startTransition(() => {
+      setInputs((prev) => {
+        const updated = { ...prev, ...newInputs };
+        try {
+          localStorage.setItem("agririsk_custom_inputs", JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      });
     });
   };
 
   const resetInputs = () => {
-    setInputs(defaultUserInputs);
-    localStorage.removeItem("agririsk_custom_inputs");
+    startTransition(() => {
+      setInputs(defaultUserInputs);
+      localStorage.removeItem("agririsk_custom_inputs");
+    });
   };
 
-  const farm = getDynamicFarm(inputs);
-  const recommendations = calculateDynamicCropRecommendations(inputs);
-  const activeCropCycle = getDynamicCropCycle(inputs);
-  const cropRisk = getDynamicCropRisk(inputs);
+  const farm = useMemo(() => getDynamicFarm(inputs), [inputs]);
+  const recommendations = useMemo(() => calculateDynamicCropRecommendations(inputs), [inputs]);
+  const activeCropCycle = useMemo(() => getDynamicCropCycle(inputs), [inputs]);
+  const cropRisk = useMemo(() => getDynamicCropRisk(inputs), [inputs]);
 
   return (
     <UserInputContext.Provider value={{ inputs, updateInputs, resetInputs, farm, recommendations, activeCropCycle, cropRisk }}>

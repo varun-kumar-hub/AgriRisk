@@ -175,18 +175,31 @@ export function loadHistoricalDataset(): HistoricalCropRecord[] {
   return [];
 }
 
+const statsCache = new Map<string, CropBenchmarkStats>();
+const trendsCache = new Map<string, any[]>();
+
 export function getCropBenchmarkStats(cropName: string): CropBenchmarkStats | null {
   const normalizedCrop = cropName.toLowerCase().trim();
 
+  if (statsCache.has(normalizedCrop)) {
+    return statsCache.get(normalizedCrop)!;
+  }
+
   // Check static benchmarks first (fast & browser-safe)
   if (DEFAULT_CROP_BENCHMARKS[normalizedCrop]) {
-    return DEFAULT_CROP_BENCHMARKS[normalizedCrop];
+    const result = DEFAULT_CROP_BENCHMARKS[normalizedCrop];
+    statsCache.set(normalizedCrop, result);
+    return result;
   }
 
   const records = loadHistoricalDataset();
   const filtered = records.filter((r) => r.crop === normalizedCrop);
 
-  if (filtered.length === 0) return DEFAULT_CROP_BENCHMARKS["rice"];
+  if (filtered.length === 0) {
+    const fallback = DEFAULT_CROP_BENCHMARKS["rice"];
+    statsCache.set(normalizedCrop, fallback);
+    return fallback;
+  }
 
   let totalYield = 0;
   let minYield = Infinity;
@@ -223,7 +236,7 @@ export function getCropBenchmarkStats(cropName: string): CropBenchmarkStats | nu
     .slice(0, 5)
     .map(([state]) => state);
 
-  return {
+  const stats: CropBenchmarkStats = {
     crop: cropName,
     recordCount: count,
     avgYieldKgPerHa: Math.round((totalYield / count) * 100) / 100,
@@ -238,9 +251,17 @@ export function getCropBenchmarkStats(cropName: string): CropBenchmarkStats | nu
     avgRainfallMm: Math.round((totalRain / count) * 10) / 10,
     topStates
   };
+
+  statsCache.set(normalizedCrop, stats);
+  return stats;
 }
 
 export function getHistoricalYieldTrends(cropName: string, stateName?: string) {
+  const cacheKey = `${cropName.toLowerCase().trim()}_${(stateName || "").toLowerCase().trim()}`;
+  if (trendsCache.has(cacheKey)) {
+    return trendsCache.get(cacheKey)!;
+  }
+
   const records = loadHistoricalDataset();
   const normalizedCrop = cropName.toLowerCase().trim();
 
@@ -249,36 +270,40 @@ export function getHistoricalYieldTrends(cropName: string, stateName?: string) {
     filtered = filtered.filter((r) => r.stateName.toLowerCase() === stateName.toLowerCase());
   }
 
+  let result: any[];
+
   if (filtered.length === 0) {
-    // Generate clean trend array from dataset historical benchmarks
     const baseYears = [1970, 1980, 1990, 2000, 2010, 2020];
     const benchmark = getCropBenchmarkStats(cropName);
     const baseYield = benchmark ? benchmark.avgYieldKgPerHa : 2200;
     const baseRain = benchmark ? benchmark.avgRainfallMm : 1000;
 
-    return baseYears.map((year, idx) => ({
+    result = baseYears.map((year, idx) => ({
       year,
       avgYield: Math.round(baseYield * (0.7 + idx * 0.08)),
       avgRainfall: Math.round(baseRain * (0.9 + (idx % 3) * 0.1))
     }));
+  } else {
+    const yearlyMap: Record<number, { totalYield: number; count: number; totalRainfall: number }> = {};
+
+    filtered.forEach((r) => {
+      if (!yearlyMap[r.year]) {
+        yearlyMap[r.year] = { totalYield: 0, count: 0, totalRainfall: 0 };
+      }
+      yearlyMap[r.year].totalYield += r.yieldKgPerHa;
+      yearlyMap[r.year].totalRainfall += r.rainfallMm;
+      yearlyMap[r.year].count += 1;
+    });
+
+    result = Object.entries(yearlyMap)
+      .map(([yearStr, data]) => ({
+        year: parseInt(yearStr, 10),
+        avgYield: Math.round(data.totalYield / data.count),
+        avgRainfall: Math.round(data.totalRainfall / data.count)
+      }))
+      .sort((a, b) => a.year - b.year);
   }
 
-  const yearlyMap: Record<number, { totalYield: number; count: number; totalRainfall: number }> = {};
-
-  filtered.forEach((r) => {
-    if (!yearlyMap[r.year]) {
-      yearlyMap[r.year] = { totalYield: 0, count: 0, totalRainfall: 0 };
-    }
-    yearlyMap[r.year].totalYield += r.yieldKgPerHa;
-    yearlyMap[r.year].totalRainfall += r.rainfallMm;
-    yearlyMap[r.year].count += 1;
-  });
-
-  return Object.entries(yearlyMap)
-    .map(([yearStr, data]) => ({
-      year: parseInt(yearStr, 10),
-      avgYield: Math.round(data.totalYield / data.count),
-      avgRainfall: Math.round(data.totalRainfall / data.count)
-    }))
-    .sort((a, b) => a.year - b.year);
+  trendsCache.set(cacheKey, result);
+  return result;
 }
