@@ -423,7 +423,7 @@ export const ALL_INDIAN_STATES: StateAgriculturalProfile[] = [
 
 export function InteractiveRiskMap() {
   const [selectedState, setSelectedState] = useState<StateAgriculturalProfile>(ALL_INDIAN_STATES[0]);
-  const [mapEngine, setMapEngine] = useState<"google" | "osm">("google");
+  const [mapEngine, setMapEngine] = useState<"google" | "osm">("osm");
 
   const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
