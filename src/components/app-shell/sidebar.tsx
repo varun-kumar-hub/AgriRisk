@@ -18,7 +18,6 @@ import {
   LineChart,
   Map,
   Menu,
-  Settings,
   Sprout,
   Tractor,
   TrendingUp,
@@ -204,26 +203,8 @@ export function Sidebar() {
           </nav>
         </div>
 
-        {/* Footer Area: Settings + Compact User Profile Popover */}
+        {/* Footer Area: Compact User Profile Popover */}
         <div className="relative border-t border-slate-200 pt-3 space-y-1">
-          {/* Settings Nav Item */}
-          <Link
-            href="/settings"
-            onClick={handleNavClick}
-            title={isCollapsed ? t("navigation.settings") : undefined}
-            className={`flex items-center rounded-xl py-2.5 text-sm font-semibold transition-all duration-75 active:scale-95 cursor-pointer ${
-              isCollapsed ? "justify-center px-0" : "justify-between px-3"
-            } ${
-              pathname.startsWith("/settings")
-                ? "bg-crop/15 text-crop font-bold shadow-sm"
-                : "text-slate-700 hover:bg-slate-100 hover:text-slate-950"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <Settings size={19} className={pathname.startsWith("/settings") ? "text-crop shrink-0" : "text-slate-500 shrink-0"} />
-              {!isCollapsed && <span className="truncate">{t("navigation.settings")}</span>}
-            </div>
-          </Link>
 
           {/* Profile Card & Popover */}
           {user ? (
