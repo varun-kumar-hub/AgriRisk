@@ -159,14 +159,7 @@ export function Sidebar() {
             </button>
           </div>
 
-          {/* Desktop Global Language Selector Bar */}
-          <div className="mt-4 px-1">
-            {isCollapsed ? (
-              <LanguageSelector compact />
-            ) : (
-              <LanguageSelector className="w-full" />
-            )}
-          </div>
+
 
           {/* Navigation Items */}
           <nav className="mt-5 space-y-4">
