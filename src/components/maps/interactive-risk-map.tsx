@@ -423,6 +423,9 @@ export const ALL_INDIAN_STATES: StateAgriculturalProfile[] = [
 
 export function InteractiveRiskMap() {
   const [selectedState, setSelectedState] = useState<StateAgriculturalProfile>(ALL_INDIAN_STATES[0]);
+  const [mapEngine, setMapEngine] = useState<"google" | "osm">("google");
+
+  const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   return (
     <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
@@ -436,11 +439,24 @@ export function InteractiveRiskMap() {
             </p>
           </div>
 
-          {/* State Dropdown Selector */}
-          <div className="flex items-center gap-2">
-            <label htmlFor="state-select" className="text-xs font-bold text-slate-700 whitespace-nowrap">
-              Select State:
-            </label>
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Map Engine Toggle */}
+            <div className="flex rounded-lg border border-slate-300 p-0.5 bg-slate-100 text-xs font-semibold">
+              <button
+                onClick={() => setMapEngine("google")}
+                className={`px-2 py-1 rounded-md transition-all ${mapEngine === "google" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"}`}
+              >
+                Google Maps
+              </button>
+              <button
+                onClick={() => setMapEngine("osm")}
+                className={`px-2 py-1 rounded-md transition-all ${mapEngine === "osm" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"}`}
+              >
+                OpenStreetMap
+              </button>
+            </div>
+
+            {/* State Dropdown Selector */}
             <select
               id="state-select"
               value={selectedState.id}
@@ -459,7 +475,7 @@ export function InteractiveRiskMap() {
           </div>
         </div>
 
-        {/* Embedded Interactive OpenStreetMap View */}
+        {/* Embedded Interactive Map View */}
         <div className="relative mt-4 flex-1 min-h-[380px] w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-inner">
           <iframe
             title={`${selectedState.name} Agricultural Risk Map`}
@@ -467,13 +483,19 @@ export function InteractiveRiskMap() {
             height="100%"
             style={{ border: 0, minHeight: "380px" }}
             loading="lazy"
-            src={`https://www.openstreetmap.org/export/embed.html?bbox=${selectedState.lng - 2.5}%2C${selectedState.lat - 2.5}%2C${selectedState.lng + 2.5}%2C${selectedState.lat + 2.5}&layer=mapnik&marker=${selectedState.lat}%2C${selectedState.lng}`}
+            src={
+              mapEngine === "google" && googleApiKey
+                ? `https://www.google.com/maps/embed/v1/place?key=${googleApiKey}&q=${encodeURIComponent(selectedState.name + ", India")}&zoom=7`
+                : `https://www.openstreetmap.org/export/embed.html?bbox=${selectedState.lng - 2.5}%2C${selectedState.lat - 2.5}%2C${selectedState.lng + 2.5}%2C${selectedState.lat + 2.5}&layer=mapnik&marker=${selectedState.lat}%2C${selectedState.lng}`
+            }
           />
 
           {/* Floating Map Badge */}
           <div className="absolute top-3 left-3 z-10 rounded-lg bg-white/95 px-3 py-1.5 shadow-md backdrop-blur border border-slate-200">
             <p className="text-xs font-bold text-slate-900">{selectedState.name}</p>
-            <p className="text-[11px] text-slate-500">Lat: {selectedState.lat.toFixed(2)}° N, Lng: {selectedState.lng.toFixed(2)}° E</p>
+            <p className="text-[11px] text-slate-500">
+              Engine: {mapEngine === "google" ? "Google Maps API" : "OpenStreetMap"} · Lat: {selectedState.lat.toFixed(2)}° N
+            </p>
           </div>
         </div>
       </Card>
