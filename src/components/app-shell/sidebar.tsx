@@ -60,7 +60,9 @@ const groups = [
 ];
 
 export function Sidebar() {
-  const { user, signOut } = useAuth();
+  const auth = useAuth();
+  const user = auth?.user ?? null;
+  const signOut = auth?.signOut ?? (async () => ({ error: null }));
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
