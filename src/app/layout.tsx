@@ -9,7 +9,10 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "AgriRisk",
-  description: "AI-powered agricultural decision and risk intelligence platform"
+  description: "AI-powered agricultural decision and risk intelligence platform",
+  icons: {
+    icon: "/icon.svg"
+  }
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

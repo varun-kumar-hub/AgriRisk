@@ -14,3 +14,14 @@ body {
 a {
   text-decoration: none;
 }
+
+button, a.btn, [role="button"] {
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:active, a.btn:active {
+  transform: scale(0.96);
+}
+

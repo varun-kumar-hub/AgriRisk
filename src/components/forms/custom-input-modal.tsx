@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useUserInput } from "@/components/providers/user-input-provider";
+import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 
 export function CustomInputPanel() {
@@ -17,12 +18,9 @@ export function CustomInputPanel() {
             Testing: <strong>{inputs.farmName}</strong> ({inputs.distName}, {inputs.stateName}) · Crop: <strong className="capitalize">{inputs.selectedCrop}</strong> · Soil pH: {inputs.soilPh} · NPK: {inputs.nitrogen}-{inputs.phosphorus}-{inputs.potassium}
           </p>
         </div>
-        <button
-          onClick={() => setIsOpen(true)}
-          className="rounded-lg bg-crop px-4 py-2 text-sm font-semibold text-white shadow hover:bg-crop/90 transition-all"
-        >
+        <Button onClick={() => setIsOpen(true)}>
           Customize My Inputs
-        </button>
+        </Button>
       </div>
     );
   }
@@ -169,18 +167,19 @@ export function CustomInputPanel() {
       </div>
 
       <div className="mt-6 flex justify-end gap-3 border-t pt-3">
-        <button
+        <Button
+          variant="outline"
+          size="sm"
           onClick={resetInputs}
-          className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
         >
           Reset Defaults
-        </button>
-        <button
+        </Button>
+        <Button
+          size="sm"
           onClick={() => setIsOpen(false)}
-          className="rounded-md bg-crop px-5 py-1.5 text-xs font-semibold text-white shadow hover:bg-crop/90"
         >
           Save & Apply
-        </button>
+        </Button>
       </div>
     </Card>
   );
