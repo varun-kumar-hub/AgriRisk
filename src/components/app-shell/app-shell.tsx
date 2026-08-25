@@ -13,9 +13,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen w-screen overflow-hidden bg-slate-50">
+      {/* Permanent Fixed Sidebar Shell */}
       <Sidebar />
-      <main className="min-w-0 flex-1 pb-20 lg:pb-0">{children}</main>
+
+      {/* Main Content Area - Independent Vertical Scroll */}
+      <main className="flex-1 h-full overflow-y-auto min-w-0 pb-20 lg:pb-0">
+        {children}
+      </main>
+
+      {/* Mobile Bottom Navigation */}
       <MobileNav />
     </div>
   );

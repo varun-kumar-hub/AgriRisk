@@ -119,9 +119,9 @@ export function Sidebar() {
         />
       )}
 
-      {/* Main Collapsible Sidebar (Fixed Shell, Inner Nav Scrollable) */}
+      {/* Main Collapsible Sidebar (Permanent Shell, Inner Nav Scrollable) */}
       <aside
-        className={`sticky top-0 z-50 flex h-screen shrink-0 flex-col justify-between overflow-hidden border-r border-slate-200 bg-white py-4 transition-all duration-300 ease-in-out ${
+        className={`h-full shrink-0 flex flex-col justify-between overflow-hidden border-r border-slate-200 bg-white py-4 transition-all duration-300 ease-in-out ${
           isCollapsed ? "w-20 px-2" : "w-64 px-4"
         } ${
           mobileOpen
