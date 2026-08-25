@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BarChart3, Bell, Bot, CloudSun, Home, LineChart, Map, Sprout, Tractor } from "lucide-react";
+import { Activity, BarChart3, Bell, Bot, CloudSun, FlaskConical, Home, Lightbulb, LineChart, Map, Sprout, Tractor } from "lucide-react";
 
 const groups = [
   { label: "Overview", items: [{ href: "/dashboard", label: "Dashboard", icon: Home }] },
@@ -14,19 +14,25 @@ const groups = [
     label: "After Planting",
     items: [
       { href: "/farms", label: "My Farms", icon: Tractor },
-      { href: "/risk", label: "Risk Intelligence", icon: LineChart },
+      { href: "/crop-health", label: "Crop Health", icon: Activity },
       { href: "/alerts", label: "Alerts", icon: Bell }
+    ]
+  },
+  {
+    label: "Intelligence",
+    items: [
+      { href: "/recommendations", label: "Recommendations", icon: Lightbulb },
+      { href: "/risk", label: "Risk Intelligence", icon: LineChart },
+      { href: "/risk-map", label: "Regional Risk Map", icon: Map }
     ]
   },
   {
     label: "AI",
     items: [
       { href: "/copilot", label: "AI Copilot", icon: Bot },
-      { href: "/recommendations", label: "Recommendations", icon: Sprout },
-      { href: "/simulator", label: "Farm Simulator", icon: CloudSun }
+      { href: "/simulator", label: "Farm Simulator", icon: FlaskConical }
     ]
-  },
-  { label: "Intelligence", items: [{ href: "/risk-map", label: "Regional Map", icon: Map }] }
+  }
 ];
 
 export function Sidebar() {
@@ -51,9 +57,9 @@ export function Sidebar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950"
+                    className="flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-950 active:scale-95 cursor-pointer"
                   >
-                    <item.icon size={17} />
+                    <item.icon size={17} className="text-crop/80" />
                     {item.label}
                   </Link>
                 ))}
@@ -62,7 +68,7 @@ export function Sidebar() {
           ))}
         </nav>
       </div>
-      <div className="border-t border-slate-100 pt-3 px-2 text-xs text-slate-400">
+      <div className="border-t border-slate-100 pt-3 px-2 text-xs font-semibold text-slate-400">
         AgriRisk v2.0 Platform
       </div>
     </aside>
