@@ -10,19 +10,25 @@ import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export default function CopilotPage() {
   const { farm, activeCropCycle, cropRisk, inputs } = useUserInput();
-  const { language, t, getCropName } = useTranslation();
+  const { language, t, getCropName, getRiskLevelLabel, getGrowthStageLabel } = useTranslation();
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [answer, setAnswer] = useState(
-    `Your ${getCropName(inputs.selectedCrop)} crop is currently in the ${activeCropCycle.stage} stage. Based on your soil pH (${inputs.soilPh}), NPK (${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}), and ${inputs.waterAvailability.toLowerCase()} water availability, agricultural risk is calculated at ${cropRisk.overallScore}/100.`
+    t("copilot.initialWelcome", {
+      crop: getCropName(inputs.selectedCrop),
+      stage: getGrowthStageLabel(activeCropCycle.stage),
+      ph: inputs.soilPh,
+      npk: `${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}`,
+      water: getRiskLevelLabel(inputs.waterAvailability),
+      score: cropRisk.overallScore
+    })
   );
   const [datasetStats, setDatasetStats] = useState<any>(null);
 
   const suggestedPrompts = [
-    t("copilot.placeholder"),
-    `What crop should I grow based on my soil pH (${inputs.soilPh})?`,
-    `What fertilizer N-P-K recommendation should I apply for ${getCropName(inputs.selectedCrop)}?`,
-    "Why is my crop risk score changing?"
+    t("copilot.suggestedQ1", { ph: inputs.soilPh }),
+    t("copilot.suggestedQ2", { crop: getCropName(inputs.selectedCrop) }),
+    t("copilot.suggestedQ3")
   ];
 
   const handleAsk = async (userPrompt: string) => {
@@ -62,14 +68,14 @@ export default function CopilotPage() {
 
       <section className="mt-6 grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
         <Card>
-          <CardTitle>Active Farm Context</CardTitle>
+          <CardTitle>{t("copilot.activeFarmContext")}</CardTitle>
           <dl className="mt-4 space-y-3 text-sm border-b pb-4">
             <div className="flex justify-between"><dt className="text-slate-500">{t("common.farm")}</dt><dd className="font-semibold">{farm.name}</dd></div>
             <div className="flex justify-between"><dt className="text-slate-500">{t("common.location")}</dt><dd className="font-semibold">{farm.location}</dd></div>
             <div className="flex justify-between"><dt className="text-slate-500">{t("common.crop")}</dt><dd className="font-semibold capitalize">{getCropName(inputs.selectedCrop)}</dd></div>
-            <div className="flex justify-between"><dt className="text-slate-500">Soil pH / NPK</dt><dd className="font-semibold">{inputs.soilPh} / {inputs.nitrogen}-{inputs.phosphorus}-{inputs.potassium}</dd></div>
-            <div className="flex justify-between"><dt className="text-slate-500">Temp / Rain</dt><dd className="font-semibold">{inputs.temperatureC}°C / {inputs.rainfallMm}mm</dd></div>
-            <div className="flex justify-between"><dt className="text-slate-500">Risk Score</dt><dd className="font-semibold">{cropRisk.overallScore}/100</dd></div>
+            <div className="flex justify-between"><dt className="text-slate-500">{t("copilot.soilPhNpk")}</dt><dd className="font-semibold">{inputs.soilPh} / {inputs.nitrogen}-{inputs.phosphorus}-{inputs.potassium}</dd></div>
+            <div className="flex justify-between"><dt className="text-slate-500">{t("common.temp")} / {t("common.rain")}</dt><dd className="font-semibold">{inputs.temperatureC}°C / {inputs.rainfallMm}mm</dd></div>
+            <div className="flex justify-between"><dt className="text-slate-500">{t("farms.cropRisk")}</dt><dd className="font-semibold">{cropRisk.overallScore}/100</dd></div>
           </dl>
 
           <p className="mt-4 text-xs font-bold uppercase tracking-wider text-slate-500">{t("copilot.suggestedQuestions")}</p>
@@ -94,7 +100,7 @@ export default function CopilotPage() {
                   <Bot size={22} />
                 </span>
                 <div>
-                  <CardTitle>AgriRisk AI Response</CardTitle>
+                  <CardTitle>{t("copilot.aiResponseHeader")}</CardTitle>
                   <p className="text-xs text-slate-500">{t("common.confidence")}: {Math.round(cropRisk.confidence * 100)}%</p>
                 </div>
               </div>
@@ -141,4 +147,5 @@ export default function CopilotPage() {
     </div>
   );
 }
+
 

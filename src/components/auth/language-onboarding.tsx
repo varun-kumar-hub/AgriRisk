@@ -5,22 +5,32 @@ import Link from "next/link";
 import { Sprout, Check, ArrowRight, Tractor } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/i18n-context";
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from "@/lib/i18n/config";
+import { useAuth } from "@/components/providers/auth-provider";
 
 const ONBOARDING_KEY = "agririsk_onboarding_completed";
 
 export function LanguageOnboardingModal() {
+  const { user, loading } = useAuth();
   const { language, setLanguage, t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<"language" | "workflow">("language");
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const completed = localStorage.getItem(ONBOARDING_KEY);
+    if (loading) return;
+
+    // Only prompt for language & workflow selection AFTER user has signed in
+    if (user) {
+      const userKey = `agririsk_onboarding_${user.id}`;
+      const completed = localStorage.getItem(userKey) || localStorage.getItem(ONBOARDING_KEY);
       if (!completed) {
         setIsOpen(true);
+      } else {
+        setIsOpen(false);
       }
+    } else {
+      setIsOpen(false);
     }
-  }, []);
+  }, [user, loading]);
 
   const handleLanguageSelect = (code: SupportedLanguage) => {
     setLanguage(code);
@@ -31,13 +41,14 @@ export function LanguageOnboardingModal() {
   };
 
   const handleFinish = () => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && user) {
+      localStorage.setItem(`agririsk_onboarding_${user.id}`, "true");
       localStorage.setItem(ONBOARDING_KEY, "true");
     }
     setIsOpen(false);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !user) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-md animate-in fade-in">
@@ -147,3 +158,4 @@ export function LanguageOnboardingModal() {
     </div>
   );
 }
+

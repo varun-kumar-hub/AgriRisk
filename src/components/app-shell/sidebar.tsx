@@ -36,16 +36,22 @@ export function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const groups = [
-    { label: t("navigation.overview"), items: [{ href: "/dashboard", label: t("navigation.dashboard"), icon: Home }] },
     {
-      label: t("navigation.beforePlanting"),
+      label: t("navigation.overview"),
       items: [
-        { href: "/crop-advisor", label: t("navigation.cropAdvisor"), icon: Sprout },
-        { href: "/crop-advisor/compare", label: t("navigation.cropComparison"), icon: BarChart3 }
+        { href: "/dashboard", label: t("navigation.dashboard"), icon: Home }
       ]
     },
     {
-      label: t("navigation.afterPlanting"),
+      label: t("navigation.cropPlanning"),
+      items: [
+        { href: "/crop-advisor", label: t("navigation.cropAdvisor"), icon: Sprout },
+        { href: "/crop-advisor/compare", label: t("navigation.cropComparison"), icon: BarChart3 },
+        { href: "/simulator", label: t("navigation.farmSimulator"), icon: FlaskConical }
+      ]
+    },
+    {
+      label: t("navigation.fieldMonitoring"),
       items: [
         { href: "/farms", label: t("navigation.myFarms"), icon: Tractor },
         { href: "/crop-health", label: t("navigation.cropHealth"), icon: Activity },
@@ -53,7 +59,7 @@ export function Sidebar() {
       ]
     },
     {
-      label: t("navigation.intelligence"),
+      label: t("navigation.riskIntelligenceSection"),
       items: [
         { href: "/recommendations", label: t("navigation.recommendations"), icon: Lightbulb },
         { href: "/risk", label: t("navigation.riskIntelligence"), icon: LineChart },
@@ -61,13 +67,13 @@ export function Sidebar() {
       ]
     },
     {
-      label: t("navigation.ai"),
+      label: t("navigation.aiAssistant"),
       items: [
-        { href: "/copilot", label: t("navigation.aiCopilot"), icon: Bot },
-        { href: "/simulator", label: t("navigation.farmSimulator"), icon: FlaskConical }
+        { href: "/copilot", label: t("navigation.aiCopilot"), icon: Bot }
       ]
     }
   ];
+
 
   const handleNavClick = () => {
     setMobileOpen(false);

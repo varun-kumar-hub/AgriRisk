@@ -57,20 +57,24 @@
   "navigation": {
     "overview": "ಅವಲೋಕನ",
     "dashboard": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
-    "beforePlanting": "ಬೆಳೆಯುವ ಮೊದಲು",
+    "cropPlanning": "ಬೆಳೆ ಯೋಜನೆ",
     "cropAdvisor": "ಬೆಳೆ ಸಲಹೆಗಾರ",
     "cropComparison": "ಬೆಳೆ ಹೋಲಿಕೆ",
-    "afterPlanting": "ಬೆಳೆದ ನಂತರ",
+    "farmSimulator": "ಫಾರ್ಮ್ ಸಿಮ್ಯುಲೇಟರ್",
+    "fieldMonitoring": "ಜಮೀನು ಮತ್ತು ಬೆಳೆ ಮೇಲ್ವಿಚಾರಣೆ",
     "myFarms": "ನನ್ನ ಜಮೀನುಗಳು",
     "cropHealth": "ಬೆಳೆ ಆರೋಗ್ಯ",
     "alerts": "ಎಚ್ಚರಿಕೆಗಳು",
-    "intelligence": "ಇಂಟೆಲಿಜೆನ್ಸ್",
+    "riskIntelligenceSection": "ಅಪಾಯ ಮತ್ತು ನಿರ್ಧಾರದ ಇಂಟೆಲಿಜೆನ್ಸ್",
     "recommendations": "ಶಿಫಾರಸುಗಳು",
     "riskIntelligence": "ಅಪಾಯದ ಇಂಟೆಲಿಜೆನ್ಸ್",
     "regionalRiskMap": "ಪ್ರಾದೇಶಿಕ ಅಪಾಯದ ನಕ್ಷೆ",
-    "ai": "ಎಐ ಇಂಟೆಲಿಜೆನ್ಸ್",
+    "aiAssistant": "ಸ್ಮಾರ್ಟ್ ಎಐ ಸಹಾಯಕ",
     "aiCopilot": "ಎಐ ಬೆಳೆ ಮಾರ್ಗದರ್ಶಿ",
-    "farmSimulator": "ಫಾರ್ಮ್ ಸಿಮ್ಯುಲೇಟರ್"
+    "beforePlanting": "ಬೆಳೆಯುವ ಮೊದಲು",
+    "afterPlanting": "ಬೆಳೆದ ನಂತರ",
+    "intelligence": "ಇಂಟೆಲಿಜೆನ್ಸ್",
+    "ai": "ಎಐ ಇಂಟೆಲಿಜೆನ್ಸ್"
   },
   "auth": {
     "title": "AgriRisk ಲಾಗಿನ್",
@@ -160,7 +164,8 @@
     "step2": "ಮಣ್ಣಿನ ಪರೀಕ್ಷೆ ವಿವರಗಳು & N-P-K ಮಟ್ಟಗಳು ಲೋಡ್ ಆಗಿವೆ",
     "step3": "ಐತಿಹಾಸಿಕ 50,000+ ಬೆಳೆ ದಾಖಲೆಗಳನ್ನು ತರಲಾಗಿದೆ",
     "step4": "ಬೆಳೆ ಸೂಕ್ತತೆ ಮತ್ತು ನೀರಿನ ಅಗತ್ಯವನ್ನು ವಿಶ್ಲೇಷಿಸಲಾಗುತ್ತಿದೆ",
-    "step5": "ಅಪಾಯದ ಸೂಚಿ ಮತ್ತು ಮಾರುಕಟ್ಟೆ ಆದಾಯವನ್ನು ಲೆಕ್ಕಹಾಕಲಾಗುತ್ತಿದೆ"
+    "step5": "ಅಪಾಯದ ಸೂಚಿ ಮತ್ತು ಮಾರುಕಟ್ಟೆ ಆದಾಯವನ್ನು ಲೆಕ್ಕಹಾಕಲಾಗುತ್ತಿದೆ",
+    "cardExplanation": "{crop} ನಿಮ್ಮ ಮಣ್ಣಿನ pH ({ph}), N-P-K ಮಟ್ಟಗಳು ({nitrogen}-{phosphorus}-{potassium}), ತಾಪಮಾನ ({temp}°C) ಮತ್ತು ಮಳೆ ({rain}ಮಿಮೀ) ಆಧಾರದ ಮೇಲೆ {score}/100 ಸ್ಕೋರ್ ಪಡೆದಿದೆ."
   },
   "cropComparison": {
     "headerTitle": "ಬೆಳೆ ಹೋಲಿಕೆ ಇಂಜಿನ್",
@@ -238,7 +243,14 @@
     "waterAvailability": "ನೀರಿನ ಲಭ್ಯತೆ",
     "pestDiseaseThreat": "ಕೀಟ ಮತ್ತು ರೋಗದ ಭೀತಿ",
     "historicalTrend": "ಐತಿಹಾಸಿಕ 7 ದಿನಗಳ ಪ್ರವೃತ್ತಿ",
-    "categoryWeighting": "ವರ್ಗವಾರು ಅಪಾಯದ ತೂಕಗಳು"
+    "categoryWeighting": "ವರ್ಗವಾರು ಅಪಾಯದ ತೂಕಗಳು",
+    "pestVulnerability": "ಕೀಟಗಳ ಬಾಧೆಯ ಅಪಾಯ",
+    "marketPriceRisk": "ಮಾರುಕಟ್ಟೆ ಬೆಲೆಯ ಅಪಾಯ",
+    "mandiesFluctuation": "ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳ ಏರಿಳಿತದ ಸೂಚಿ",
+    "yieldLossRisk": "ಇಳುವರಿ ನಷ್ಟದ ಅಪಾಯ",
+    "estimatedYieldVariability": "ಅಂದಾಜು ಇಳುವರಿ ವ್ಯತ್ಯಾಸ",
+    "economicRisk": "ಆರ್ಥಿಕ ಅಪಾಯ",
+    "returnOnInvestment": "ಹೂಡಿಕೆಯ ಆದಾಯದ ಅಪಾಯ"
   },
   "recommendations": {
     "title": "ಎಐ ಶಿಫಾರಸು ಮಾಡಿದ ಕ್ರಮಗಳು",
@@ -266,7 +278,14 @@
     "placeholder": "ಕನ್ನಡ, English, தமிழ், తెలుగు ಅಥವಾ हिन्दी ಯಲ್ಲಿ ಎಐ ಅನ್ನು ಕೇಳಿ...",
     "send": "ಪ್ರಶ್ನಿಸಿ",
     "suggestedQuestions": "ಶಿಫಾರಸು ಮಾಡಿದ ಪ್ರಶ್ನೆಗಳು",
-    "disclaimer": "ಎಐ ಶಿಫಾರಸುಗಳನ್ನು ಐತಿಹಾಸಿಕ ಕೃಷಿ ಡೇಟಾ ಮತ್ತು ಹವಾಮಾನ ಮಾದರಿಗಳ ಆಧಾರದ ಮೇಲೆ ರಚಿಸಲಾಗಿದೆ."
+    "disclaimer": "ಎಐ ಶಿಫಾರಸುಗಳನ್ನು ಐತಿಹಾಸಿಕ ಕೃಷಿ ಡೇಟಾ ಮತ್ತು ಹವಾಮಾನ ಮಾದರಿಗಳ ಆಧಾರದ ಮೇಲೆ ರಚಿಸಲಾಗಿದೆ.",
+    "activeFarmContext": "ಸಕ್ರಿಯ ಜಮೀನಿನ ವಿವರ",
+    "aiResponseHeader": "AGRIRISK AI ಪ್ರತಿಕ್ರಿಯೆ",
+    "soilPhNpk": "ಮಣ್ಣಿನ pH / NPK",
+    "suggestedQ1": "ನನ್ನ ಮಣ್ಣಿನ pH ({ph}) ಆಧಾರದ ಮೇಲೆ ನಾನು ಯಾವ ಬೆಳೆ ಬೆಳೆಯಬೇಕು?",
+    "suggestedQ2": "{crop} ಬೆಳೆಗೆ ಯಾವ ಗೊಬ್ಬರದ N-P-K ಶಿಫಾರಸು ಅನ್ವಯಿಸಬೇಕು?",
+    "suggestedQ3": "ನನ್ನ ಬೆಳೆಯ ಅಪಾಯದ ಸ್ಕೋರ್ ಏಕೆ ಬದಲಾಗುತ್ತಿದೆ?",
+    "initialWelcome": "ನಿಮ್ಮ {crop} ಬೆಳೆಯು ಪ್ರಸ್ತುತ {stage} ಹಂತದಲ್ಲಿದೆ. ಮಣ್ಣಿನ pH ({ph}), NPK ({npk}) ಮತ್ತು ನೀರಿನ ಲಭ್ಯತೆಯ ಆಧಾರದ ಮೇಲೆ ಕೃಷಿ ಅಪಾಯದ ಸ್ಕೋರ್ {score}/100 ಆಗಿದೆ."
   },
   "simulator": {
     "title": "ಫಾರ್ಮ್ ಸಿಮ್ಯುಲೇಟರ್",

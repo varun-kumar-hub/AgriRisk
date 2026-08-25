@@ -57,20 +57,24 @@
   "navigation": {
     "overview": "అవలోకనం",
     "dashboard": "డాష్‌బోర్డ్",
-    "beforePlanting": "విత్తడానికి ముందు",
+    "cropPlanning": "పంట ప్రణాళిక",
     "cropAdvisor": "పంట సలహాదారు",
     "cropComparison": "పంటల పోలిక",
-    "afterPlanting": "విత్తిన తర్వాత",
+    "farmSimulator": "ఫార్మ్ సిమ్యులేటర్",
+    "fieldMonitoring": "పొలం & పంట పర్యవేక్షణ",
     "myFarms": "నా పొలాలు",
     "cropHealth": "పంట ఆరోగ్యం",
     "alerts": "హెచ్చరికలు",
-    "intelligence": "ఇంటెలిజెన్స్",
+    "riskIntelligenceSection": "ప్రమాద & నిర్ణయ మేధస్సు",
     "recommendations": "సిఫార్సులు",
     "riskIntelligence": "ప్రమాద ఇంటెలిజెన్స్",
     "regionalRiskMap": "ప్రాంతీయ ప్రమాద మ్యాప్",
-    "ai": "AI మేధస్సు",
+    "aiAssistant": "స్మార్ట్ AI సహాయకుడు",
     "aiCopilot": "AI కోపైలట్",
-    "farmSimulator": "ఫార్మ్ సిమ్యులేటర్"
+    "beforePlanting": "విత్తడానికి ముందు",
+    "afterPlanting": "విత్తిన తర్వాత",
+    "intelligence": "ఇంటెలిజెన్స్",
+    "ai": "AI మేధస్సు"
   },
   "auth": {
     "title": "AgriRisk లాగిన్",
@@ -160,7 +164,8 @@
     "step2": "నేల పరీక్ష ప్రొఫైల్ & N-P-K స్థాయిలు లోడ్ అయ్యాయి",
     "step3": "చారిత్రక 50,000+ పంట రికార్డులు వచ్చాయి",
     "step4": "పంట అనుకూలత & నీటి అవసరాన్ని విశ్లేషిస్తోంది",
-    "step5": "ప్రమాద సూచిక & మార్కెట్ లాభాన్ని లెక్కిస్తోంది"
+    "step5": "ప్రమాద సూచిక & మార్కెట్ లాభాన్ని లెక్కిస్తోంది",
+    "cardExplanation": "{crop} మీ నేల pH ({ph}), N-P-K స్థాయిలు ({nitrogen}-{phosphorus}-{potassium}), ఉష్ణోగ్రత ({temp}°C) మరియు వర్షపాతం ({rain}మిమీ) ఆధారంగా {score}/100 స్కోర్ పొందింది."
   },
   "cropComparison": {
     "headerTitle": "పంటల పోలిక ఇంజిన్",
@@ -238,7 +243,14 @@
     "waterAvailability": "నీటి లభ్యత",
     "pestDiseaseThreat": "పురుగులు మరియు వ్యాధుల ముప్పు",
     "historicalTrend": "చారిత్రక 7 రోజుల ధోరణి",
-    "categoryWeighting": "విభాగాల వారీగా ప్రమాద బరువులు"
+    "categoryWeighting": "విభాగాల వారీగా ప్రమాద బరువులు",
+    "pestVulnerability": "పురుగుల దాడి ప్రమాదం",
+    "marketPriceRisk": "మార్కెట్ ధరల ప్రమాదం",
+    "mandiesFluctuation": "మార్కెట్ ధరల అస్థిరత సూచిక",
+    "yieldLossRisk": "దిగుబడి నష్ట ప్రమాదం",
+    "estimatedYieldVariability": "అంచనా వేసిన దిగుబడి మార్పు",
+    "economicRisk": "ఆర్థిక ప్రమాదం",
+    "returnOnInvestment": "పెట్టుబడి రాబడి ప్రమాదం"
   },
   "recommendations": {
     "title": "AI సూచించిన చర్యలు",
@@ -266,7 +278,14 @@
     "placeholder": "తెలుగు, English, தமிழ், తెలుగు, ಕನ್ನಡ లేదా हिन्दी లో AI ని అడగండి...",
     "send": "ప్రశ్నించండి",
     "suggestedQuestions": "సూచించిన ప్రశ్నలు",
-    "disclaimer": "AI సిఫార్సులు చారిత్రక వ్యవసాయ డేటా మరియు వాతావరణ నమూనాల ఆధారంగా రూపొందించబడ్డాయి."
+    "disclaimer": "AI సిఫార్సులు చారిత్రక వ్యవసాయ డేటా మరియు వాతావరణ నమూనాల ఆధారంగా రూపొందించబడ్డాయి.",
+    "activeFarmContext": "యాక్టివ్ పొలం సందర్భం",
+    "aiResponseHeader": "AGRIRISK AI స్పందన",
+    "soilPhNpk": "నేల pH / NPK",
+    "suggestedQ1": "నా నేల pH ({ph}) ఆధారంగా నేను ఏ పంట వేయాలి?",
+    "suggestedQ2": "{crop} పంటకు ఏ ఎరువుల N-P-K సిఫార్సు వర్తింపజేయాలి?",
+    "suggestedQ3": "నా పంట ప్రమాద స్కోరు ఎందుకు మారుతోంది?",
+    "initialWelcome": "మీ {crop} పంట ప్రస్తుతం {stage} దశలో ఉంది. నేల pH ({ph}), NPK ({npk}) మరియు నీటి లభ్యత ఆధారంగా వ్యవసాయ ప్రమాద స్కోరు {score}/100 గా లెక్కింబడింది."
   },
   "simulator": {
     "title": "ఫార్మ్ సిమ్యులేటర్",

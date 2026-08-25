@@ -55,22 +55,26 @@
     "saveApply": "सहेजें और लागू करें"
   },
   "navigation": {
-    "overview": "अवलोकन",
+    "overview": "मुख्य डैशबोर्ड",
     "dashboard": "डैशबोर्ड",
-    "beforePlanting": "बुआई से पहले",
+    "cropPlanning": "फसल योजना",
     "cropAdvisor": "फसल सलाहकार",
     "cropComparison": "फसल तुलना",
-    "afterPlanting": "बुआई के बाद",
+    "farmSimulator": "फार्म सिमलेटर",
+    "fieldMonitoring": "खेत एवं फसल निगरानी",
     "myFarms": "मेरे खेत",
     "cropHealth": "फसल स्वास्थ्य",
     "alerts": "चेतावनी",
-    "intelligence": "इंटेलिजेंस",
+    "riskIntelligenceSection": "जोखिम एवं निर्णय बुद्धिमत्ता",
     "recommendations": "सिफारिशें",
     "riskIntelligence": "जोखिम इंटेलिजेंस",
     "regionalRiskMap": "क्षेत्रीय जोखिम मानचित्र",
-    "ai": "एआई इंटेलिजेंस",
+    "aiAssistant": "स्मार्ट एआई सहायक",
     "aiCopilot": "एआई सह-पायलट",
-    "farmSimulator": "फार्म सिमलेटर"
+    "beforePlanting": "बुआई से पहले",
+    "afterPlanting": "बुआई के बाद",
+    "intelligence": "इंटेलिजेंस",
+    "ai": "एआई इंटेलिजेंस"
   },
   "auth": {
     "title": "AgriRisk लॉगिन",
@@ -160,7 +164,8 @@
     "step2": "मिट्टी परीक्षण प्रोफाइल और N-P-K स्तर लोड हुए",
     "step3": "ऐतिहासिक 50,000+ फसल रिकॉर्ड प्राप्त किए गए",
     "step4": "फसल उपयुक्तता और पानी की मांग का विश्लेषण किया जा रहा है",
-    "step5": "जोखिम सूचकांक और बाजार लाभ की गणना की जा रही है"
+    "step5": "जोखिम सूचकांक और बाजार लाभ की गणना की जा रही है",
+    "cardExplanation": "{crop} ने आपकी मिट्टी के pH ({ph}), N-P-K स्तरों ({nitrogen}-{phosphorus}-{potassium}), तापमान ({temp}°C), और वर्षा ({rain}मिमी) के आधार पर {score}/100 स्कोर किया।"
   },
   "cropComparison": {
     "headerTitle": "फसल तुलना इंजन",
@@ -238,7 +243,14 @@
     "waterAvailability": "पानी की उपलब्धता",
     "pestDiseaseThreat": "कीट और बीमारी का खतरा",
     "historicalTrend": "ऐतिहासिक 7-दिवसीय रुझान",
-    "categoryWeighting": "श्रेणीवार जोखिम भार"
+    "categoryWeighting": "श्रेणीवार जोखिम भार",
+    "pestVulnerability": "कीट प्रकोप जोखिम",
+    "marketPriceRisk": "बाजार मूल्य जोखिम",
+    "mandiesFluctuation": "मंडी मूल्य में उतार-चढ़ाव सूचकांक",
+    "yieldLossRisk": "पैदावार हानि जोखिम",
+    "estimatedYieldVariability": "अनुमानित पैदावार परिवर्तनशीलता",
+    "economicRisk": "आर्थिक जोखिम",
+    "returnOnInvestment": "निवेश पर लाभ जोखिम"
   },
   "recommendations": {
     "title": "एआई अनुशंसित कार्रवाइयां",
@@ -266,7 +278,14 @@
     "placeholder": "हिन्दी, English, தமிழ், తెలుగు या ಕನ್ನಡ में एआई से पूछें...",
     "send": "पूछें",
     "suggestedQuestions": "अनुशंसित प्रश्न",
-    "disclaimer": "एआई सिफारिशें ऐतिहासिक कृषि डेटा और मौसम मॉडल के आधार पर तैयार की जाती हैं।"
+    "disclaimer": "एआई सिफारिशें ऐतिहासिक कृषि डेटा और मौसम मॉडल के आधार पर तैयार की जाती हैं।",
+    "activeFarmContext": "सक्रिय खेत संदर्भ",
+    "aiResponseHeader": "AGRIRISK AI उत्तर",
+    "soilPhNpk": "मिट्टी pH / NPK",
+    "suggestedQ1": "मेरी मिट्टी के pH ({ph}) के आधार पर मुझे कौन सी फसल उगानी चाहिए?",
+    "suggestedQ2": "{crop} फसल के लिए मुझे कौन सी उर्वरक N-P-K सिफारिश लागू करनी चाहिए?",
+    "suggestedQ3": "मेरा फसल जोखिम स्कोर क्यों बदल रहा है?",
+    "initialWelcome": "आपकी {crop} फसल वर्तमान में {stage} चरण में है। आपकी मिट्टी के pH ({ph}), NPK ({npk}) और जल उपलब्धता के आधार पर कृषि जोखिम {score}/100 की गणना की गई है।"
   },
   "simulator": {
     "title": "फार्म सिम्युलेटर",

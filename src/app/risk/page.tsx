@@ -123,27 +123,28 @@ export default function RiskIntelligencePage() {
 
               <div className="rounded-xl bg-slate-50 p-4 border border-slate-200">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><TrendingDown size={15} className="text-indigo-500" /> {t("dashboard.overallRisk")}</span>
+                  <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><TrendingDown size={15} className="text-indigo-500" /> {t("risk.marketPriceRisk")}</span>
                   <span className="font-extrabold text-sm text-slate-900">{marketRisk}/100</span>
                 </div>
-                <p className="mt-2 text-xs text-slate-600">Mandies price fluctuation index</p>
+                <p className="mt-2 text-xs text-slate-600">{t("risk.mandiesFluctuation")}</p>
               </div>
 
               <div className="rounded-xl bg-slate-50 p-4 border border-slate-200">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><Wheat size={15} className="text-amber-600" /> Yield Loss Risk</span>
+                  <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><Wheat size={15} className="text-amber-600" /> {t("risk.yieldLossRisk")}</span>
                   <span className="font-extrabold text-sm text-slate-900">{yieldRisk}/100</span>
                 </div>
-                <p className="mt-2 text-xs text-slate-600">Estimated yield variability</p>
+                <p className="mt-2 text-xs text-slate-600">{t("risk.estimatedYieldVariability")}</p>
               </div>
 
               <div className="rounded-xl bg-slate-50 p-4 border border-slate-200">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><DollarSign size={15} className="text-emerald-600" /> Economic Risk</span>
+                  <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><DollarSign size={15} className="text-emerald-600" /> {t("risk.economicRisk")}</span>
                   <span className="font-extrabold text-sm text-slate-900">{economicRisk}/100</span>
                 </div>
-                <p className="mt-2 text-xs text-slate-600">Return on investment risk</p>
+                <p className="mt-2 text-xs text-slate-600">{t("risk.returnOnInvestment")}</p>
               </div>
+
             </div>
           </Card>
 

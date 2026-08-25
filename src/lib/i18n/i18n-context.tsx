@@ -6,6 +6,10 @@ import {
   SUPPORTED_LANGUAGES,
   CROP_TRANSLATIONS,
   RISK_LEVEL_TRANSLATIONS,
+  SOIL_TYPE_TRANSLATIONS,
+  IRRIGATION_TRANSLATIONS,
+  GROWTH_STAGE_TRANSLATIONS,
+  SEASON_TRANSLATIONS,
   type SupportedLanguage,
 } from "./config";
 import en from "./locales/en.json";
@@ -22,6 +26,10 @@ interface LanguageContextType {
   t: (key: string, params?: Record<string, string | number>) => string;
   getCropName: (cropId: string) => string;
   getRiskLevelLabel: (riskLevel: string) => string;
+  getSoilTypeLabel: (soilType: string) => string;
+  getIrrigationLabel: (irrigationType: string) => string;
+  getGrowthStageLabel: (stage: string) => string;
+  getSeasonLabel: (season: string) => string;
   isPending: boolean;
 }
 
@@ -34,7 +42,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    // 1. Check URL query string e.g. ?lang=ta
     if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
       const urlLang = urlParams.get("lang") as SupportedLanguage;
@@ -44,14 +51,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // 2. Check localStorage
       const savedLang = localStorage.getItem(STORAGE_KEY) as SupportedLanguage;
       if (savedLang && SUPPORTED_LANGUAGES.some((l) => l.code === savedLang)) {
         setLanguageState(savedLang);
         return;
       }
 
-      // 3. Fetch from user profile if logged in
       fetch("/api/profile/language")
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
@@ -72,13 +77,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       if (typeof window !== "undefined") {
         localStorage.setItem(STORAGE_KEY, newLang);
         
-        // Sync URL query string without reloading page
         const url = new URL(window.location.href);
         url.searchParams.set("lang", newLang);
         window.history.replaceState({}, "", url.toString());
       }
 
-      // Persist to user profile via API
       fetch("/api/profile/language", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -95,13 +98,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       if (current && typeof current === "object" && k in current) {
         current = current[k];
       } else {
-        // Fallback to English dictionary
         let fallback: any = dictionaries[DEFAULT_LANGUAGE];
         for (const fk of keys) {
           if (fallback && typeof fallback === "object" && fk in fallback) {
             fallback = fallback[fk];
           } else {
-            return key; // return key if missing completely
+            return key;
           }
         }
         current = fallback;
@@ -143,6 +145,38 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     return riskLevel;
   };
 
+  const getSoilTypeLabel = (soilType: string): string => {
+    const lower = soilType.toLowerCase().trim();
+    if (SOIL_TYPE_TRANSLATIONS[lower]) {
+      return SOIL_TYPE_TRANSLATIONS[lower][language] || SOIL_TYPE_TRANSLATIONS[lower][DEFAULT_LANGUAGE];
+    }
+    return soilType;
+  };
+
+  const getIrrigationLabel = (irrigationType: string): string => {
+    const lower = irrigationType.toLowerCase().trim();
+    if (IRRIGATION_TRANSLATIONS[lower]) {
+      return IRRIGATION_TRANSLATIONS[lower][language] || IRRIGATION_TRANSLATIONS[lower][DEFAULT_LANGUAGE];
+    }
+    return irrigationType;
+  };
+
+  const getGrowthStageLabel = (stage: string): string => {
+    const lower = stage.toLowerCase().trim();
+    if (GROWTH_STAGE_TRANSLATIONS[lower]) {
+      return GROWTH_STAGE_TRANSLATIONS[lower][language] || GROWTH_STAGE_TRANSLATIONS[lower][DEFAULT_LANGUAGE];
+    }
+    return stage;
+  };
+
+  const getSeasonLabel = (season: string): string => {
+    const lower = season.toLowerCase().trim();
+    if (SEASON_TRANSLATIONS[lower]) {
+      return SEASON_TRANSLATIONS[lower][language] || SEASON_TRANSLATIONS[lower][DEFAULT_LANGUAGE];
+    }
+    return season;
+  };
+
   return (
     <LanguageContext.Provider
       value={{
@@ -151,6 +185,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         t,
         getCropName,
         getRiskLevelLabel,
+        getSoilTypeLabel,
+        getIrrigationLabel,
+        getGrowthStageLabel,
+        getSeasonLabel,
         isPending,
       }}
     >
@@ -166,3 +204,4 @@ export function useTranslation() {
   }
   return context;
 }
+

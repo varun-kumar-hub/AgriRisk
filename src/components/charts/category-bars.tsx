@@ -2,9 +2,27 @@
 
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { CropRisk } from "@/types/domain";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export function CategoryBars({ risk }: { risk: CropRisk }) {
-  const data = Object.entries(risk.categories).map(([category, score]) => ({ category, score }));
+  const { t } = useTranslation();
+
+  const getCategoryLabel = (category: string) => {
+    switch (category.toLowerCase()) {
+      case "weather": return t("risk.weatherRisk");
+      case "water": return t("risk.waterAvailability");
+      case "soil": return t("risk.soilRisk");
+      case "market": return t("risk.marketVolatility");
+      case "pest": return t("risk.pestVulnerability");
+      case "production": return t("risk.yieldLossRisk");
+      default: return category;
+    }
+  };
+
+  const data = Object.entries(risk.categories).map(([category, score]) => ({
+    category: getCategoryLabel(category),
+    score
+  }));
 
   return (
     <div className="h-72">
@@ -19,3 +37,4 @@ export function CategoryBars({ risk }: { risk: CropRisk }) {
     </div>
   );
 }
+

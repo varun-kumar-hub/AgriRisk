@@ -11,7 +11,7 @@ import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export default function FarmsPage() {
   const { farm, activeCropCycle, cropRisk, inputs } = useUserInput();
-  const { t, getCropName, getRiskLevelLabel } = useTranslation();
+  const { t, getCropName, getRiskLevelLabel, getSoilTypeLabel, getIrrigationLabel, getGrowthStageLabel, getSeasonLabel } = useTranslation();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -34,9 +34,9 @@ export default function FarmsPage() {
           <p className="mt-1 text-slate-600">{farm.location}</p>
           <dl className="mt-5 space-y-3 text-sm">
             <div className="flex justify-between"><dt className="text-slate-500">{t("common.area")}</dt><dd>{farm.areaAcres} {t("farms.acres")}</dd></div>
-            <div className="flex justify-between"><dt className="text-slate-500">{t("common.soil")}</dt><dd>{farm.soilType} (pH {farm.soilPh})</dd></div>
-            <div className="flex justify-between"><dt className="text-slate-500">Soil N-P-K</dt><dd>{inputs.nitrogen}-{inputs.phosphorus}-{inputs.potassium} kg/ha</dd></div>
-            <div className="flex justify-between"><dt className="text-slate-500">{t("common.irrigation")}</dt><dd>{farm.irrigationType}</dd></div>
+            <div className="flex justify-between"><dt className="text-slate-500">{t("common.soil")}</dt><dd>{getSoilTypeLabel(farm.soilType)} (pH {farm.soilPh})</dd></div>
+            <div className="flex justify-between"><dt className="text-slate-500">{t("common.soil")} N-P-K</dt><dd>{inputs.nitrogen}-{inputs.phosphorus}-{inputs.potassium} kg/ha</dd></div>
+            <div className="flex justify-between"><dt className="text-slate-500">{t("common.irrigation")}</dt><dd>{getIrrigationLabel(farm.irrigationType)}</dd></div>
             <div className="flex justify-between"><dt className="text-slate-500">{t("customInput.waterAvailability")}</dt><dd>{getRiskLevelLabel(farm.waterAvailability)}</dd></div>
           </dl>
           <Link href={`/farms/${farm.id}`} className="mt-6 block rounded-md bg-slate-950 px-4 py-2 text-center text-sm font-semibold text-white">
@@ -44,7 +44,7 @@ export default function FarmsPage() {
           </Link>
         </Card>
         <div className="grid gap-4 md:grid-cols-3">
-          <MetricCard title={t("farms.activeCrop")} value={getCropName(activeCropCycle.crop)} detail={`${activeCropCycle.season} · ${activeCropCycle.stage}`} />
+          <MetricCard title={t("farms.activeCrop")} value={getCropName(activeCropCycle.crop)} detail={`${getSeasonLabel(activeCropCycle.season)} · ${getGrowthStageLabel(activeCropCycle.stage)}`} />
           <MetricCard title={t("farms.cropAge")} value={`${activeCropCycle.ageDays} days`} detail={t("farms.sinceSowing")} />
           <MetricCard title={t("farms.cropRisk")} value={`${cropRisk.overallScore}/100`} detail={t("farms.dynamicRiskScore")}><RiskBadge level={cropRisk.level} /></MetricCard>
         </div>
@@ -52,5 +52,6 @@ export default function FarmsPage() {
     </div>
   );
 }
+
 
 

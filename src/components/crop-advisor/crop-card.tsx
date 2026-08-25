@@ -4,9 +4,11 @@ import { RiskBadge } from "@/components/ui/risk-badge";
 import { formatCurrency } from "@/lib/scoring/risk";
 import type { CropRecommendation } from "@/types/domain";
 import { useTranslation } from "@/lib/i18n/i18n-context";
+import { useUserInput } from "@/components/providers/user-input-provider";
 
 export function CropCard({ crop }: { crop: CropRecommendation }) {
   const { t, getCropName } = useTranslation();
+  const { inputs } = useUserInput();
 
   return (
     <Card className="flex h-full flex-col">
@@ -35,11 +37,23 @@ export function CropCard({ crop }: { crop: CropRecommendation }) {
           <p className="text-xl font-semibold">{formatCurrency(crop.riskAdjustedProfit)}</p>
         </div>
       </div>
-      <p className="mt-5 flex-1 text-sm leading-6 text-slate-600">{crop.explanation}</p>
+      <p className="mt-5 flex-1 text-sm leading-6 text-slate-600">
+        {t("cropAdvisor.cardExplanation", {
+          crop: getCropName(crop.crop),
+          score: crop.decisionScore,
+          ph: inputs.soilPh,
+          nitrogen: inputs.nitrogen,
+          phosphorus: inputs.phosphorus,
+          potassium: inputs.potassium,
+          temp: inputs.temperatureC,
+          rain: inputs.rainfallMm,
+        })}
+      </p>
       <Link className="mt-5 rounded-md bg-crop px-4 py-2 text-center text-sm font-semibold text-white" href={`/crop-advisor/${crop.crop.toLowerCase()}`}>
         {t("cropAdvisor.viewDecisionDetail")}
       </Link>
     </Card>
   );
 }
+
 

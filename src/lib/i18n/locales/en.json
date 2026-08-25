@@ -55,22 +55,26 @@
     "saveApply": "Save & Apply"
   },
   "navigation": {
-    "overview": "Overview",
+    "overview": "OVERVIEW",
     "dashboard": "Dashboard",
-    "beforePlanting": "Before Planting",
+    "cropPlanning": "CROP PLANNING",
     "cropAdvisor": "Crop Advisor",
     "cropComparison": "Crop Comparison",
-    "afterPlanting": "After Planting",
+    "farmSimulator": "Farm Simulator",
+    "fieldMonitoring": "FIELD & CROP MONITORING",
     "myFarms": "My Farms",
     "cropHealth": "Crop Health",
-    "alerts": "Alerts",
-    "intelligence": "Intelligence",
+    "alerts": "Alerts & Warnings",
+    "riskIntelligenceSection": "RISK & DECISION INTELLIGENCE",
     "recommendations": "Recommendations",
     "riskIntelligence": "Risk Intelligence",
     "regionalRiskMap": "Regional Risk Map",
-    "ai": "AI Intelligence",
+    "aiAssistant": "SMART AI ASSISTANT",
     "aiCopilot": "AI Copilot",
-    "farmSimulator": "Farm Simulator"
+    "beforePlanting": "Before Planting",
+    "afterPlanting": "After Planting",
+    "intelligence": "Intelligence",
+    "ai": "AI Intelligence"
   },
   "auth": {
     "title": "AgriRisk Login",
@@ -160,7 +164,8 @@
     "step2": "Soil test profile & N-P-K levels loaded",
     "step3": "Historical 50,000+ crop records retrieved",
     "step4": "Analyzing crop suitability fit & water demand",
-    "step5": "Calculating risk index & market return"
+    "step5": "Calculating risk index & market return",
+    "cardExplanation": "{crop} scored {score}/100 based on your custom soil pH ({ph}), N-P-K levels ({nitrogen}-{phosphorus}-{potassium}), temperature ({temp}°C), and rainfall ({rain}mm)."
   },
   "cropComparison": {
     "headerTitle": "Crop Comparison Engine",
@@ -237,8 +242,15 @@
     "soilRisk": "SOIL RISK",
     "waterAvailability": "WATER AVAILABILITY",
     "pestDiseaseThreat": "PEST & DISEASE THREAT",
+    "pestVulnerability": "PEST VULNERABILITY",
     "historicalTrend": "Historical 7-Day Trend",
-    "categoryWeighting": "Category Weighting"
+    "categoryWeighting": "Category Weighting",
+    "marketPriceRisk": "MARKET PRICE RISK",
+    "mandiesFluctuation": "Mandies price fluctuation index",
+    "yieldLossRisk": "YIELD LOSS RISK",
+    "estimatedYieldVariability": "Estimated yield variability",
+    "economicRisk": "ECONOMIC RISK",
+    "returnOnInvestment": "Return on investment risk"
   },
   "recommendations": {
     "title": "AI Intervention Recommendations",
@@ -266,7 +278,14 @@
     "placeholder": "Ask AgriRisk AI anything in English, தமிழ், తెలుగు, ಕನ್ನಡ, or हिन्दी...",
     "send": "Ask AI",
     "suggestedQuestions": "Suggested Questions",
-    "disclaimer": "AI recommendations are generated based on historical agricultural data & weather models."
+    "disclaimer": "AI recommendations are generated based on historical agricultural data & weather models.",
+    "activeFarmContext": "ACTIVE FARM CONTEXT",
+    "aiResponseHeader": "AGRIRISK AI RESPONSE",
+    "soilPhNpk": "Soil pH / NPK",
+    "suggestedQ1": "What crop should I grow based on my soil pH ({ph})?",
+    "suggestedQ2": "What fertilizer N-P-K recommendation should I apply for {crop}?",
+    "suggestedQ3": "Why is my crop risk score changing?",
+    "initialWelcome": "Your {crop} crop is currently in the {stage} stage. Based on your soil pH ({ph}), NPK ({npk}), and {water} water availability, agricultural risk is calculated at {score}/100."
   },
   "simulator": {
     "title": "Interactive Farm Simulator",
