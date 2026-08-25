@@ -1,26 +1,27 @@
-import { NextResponse } from "next/server";
-import { getCropBenchmarkStats } from "@/lib/data/historical-dataset";
-import { cropRecommendations } from "@/lib/mock/data";
+import { NextRequest, NextResponse } from "next/server";
+import { predictCropRecommendationsWithGemini } from "@/lib/ai/gemini-predictor";
+import { defaultUserInputs, type CustomUserInputs } from "@/lib/data/store";
+import type { SupportedLanguage } from "@/lib/i18n/config";
 
-export function POST() {
-  const enrichedRecommendations = cropRecommendations.map((rec) => {
-    const stats = getCropBenchmarkStats(rec.crop);
-    if (!stats) return rec;
-
-    return {
-      ...rec,
-      expectedYield: stats.avgYieldKgPerHa ? Math.round((stats.avgYieldKgPerHa / 1000) * 10) / 10 : rec.expectedYield,
-      historicalStats: {
-        totalRecords: stats.recordCount,
-        avgYieldKgPerHa: stats.avgYieldKgPerHa,
-        optimalTempC: stats.avgTempC,
-        optimalRainfallMm: stats.avgRainfallMm,
-        nReq: stats.avgNReq,
-        pReq: stats.avgPReq,
-        kReq: stats.avgKReq
-      }
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json().catch(() => ({}));
+    const inputs: CustomUserInputs = {
+      ...defaultUserInputs,
+      ...(body.inputs || body)
     };
-  });
+    const language: SupportedLanguage = body.language || "en";
 
-  return NextResponse.json({ recommendations: enrichedRecommendations });
+    const recommendations = await predictCropRecommendationsWithGemini(inputs, language);
+
+    return NextResponse.json({
+      recommendations,
+      inputs,
+      language,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error("Crop Advisor API error:", error);
+    return NextResponse.json({ error: "Failed to generate dynamic crop recommendations" }, { status: 500 });
+  }
 }

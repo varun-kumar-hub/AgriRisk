@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, startTransition } from "react";
 import { useAuth } from "@/components/providers/auth-provider";
+import { useTranslation } from "@/lib/i18n/i18n-context";
 import { defaultUserInputs, CustomUserInputs, calculateDynamicCropRecommendations, getDynamicFarm, getDynamicCropCycle, getDynamicCropRisk } from "@/lib/data/store";
 import type { Farm, CropRecommendation, CropCycle, CropRisk } from "@/types/domain";
 
@@ -13,12 +14,15 @@ interface UserInputContextType {
   recommendations: CropRecommendation[];
   activeCropCycle: CropCycle;
   cropRisk: CropRisk;
+  loadingAi: boolean;
+  refreshAiPredictions: () => Promise<void>;
 }
 
 const UserInputContext = createContext<UserInputContextType | null>(null);
 
 export function UserInputProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
+  const { language } = useTranslation();
   const userId = user?.id || "guest";
   const storageKey = `agririsk_inputs_${userId}`;
 
@@ -28,6 +32,9 @@ export function UserInputProvider({ children }: { children: React.ReactNode }) {
       farmName: user?.email ? `${user.email.split("@")[0]}'s Farm` : defaultUserInputs.farmName
     };
   });
+
+  const [aiRecommendations, setAiRecommendations] = useState<CropRecommendation[]>([]);
+  const [loadingAi, setLoadingAi] = useState(false);
 
   // Re-load user-isolated inputs whenever user changes
   useEffect(() => {
@@ -45,6 +52,30 @@ export function UserInputProvider({ children }: { children: React.ReactNode }) {
       });
     }
   }, [userId, user?.email, storageKey]);
+
+  const refreshAiPredictions = async () => {
+    setLoadingAi(true);
+    try {
+      const res = await fetch("/api/crop-advisor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inputs, language })
+      });
+      const data = await res.json();
+      if (data.recommendations && Array.isArray(data.recommendations) && data.recommendations.length > 0) {
+        setAiRecommendations(data.recommendations);
+      }
+    } catch (e) {
+      console.warn("Failed to fetch AI crop predictions:", e);
+    } finally {
+      setLoadingAi(false);
+    }
+  };
+
+  // Fetch AI predictions when inputs or language change
+  useEffect(() => {
+    refreshAiPredictions();
+  }, [inputs, language]);
 
   const updateInputs = (newInputs: Partial<CustomUserInputs>) => {
     startTransition(() => {
@@ -70,12 +101,26 @@ export function UserInputProvider({ children }: { children: React.ReactNode }) {
   };
 
   const farm = useMemo(() => getDynamicFarm(inputs), [inputs]);
-  const recommendations = useMemo(() => calculateDynamicCropRecommendations(inputs), [inputs]);
+  const fallbackRecommendations = useMemo(() => calculateDynamicCropRecommendations(inputs), [inputs]);
   const activeCropCycle = useMemo(() => getDynamicCropCycle(inputs), [inputs]);
   const cropRisk = useMemo(() => getDynamicCropRisk(inputs), [inputs]);
 
+  const mergedRecommendations = useMemo(() => {
+    return aiRecommendations.length > 0 ? aiRecommendations : fallbackRecommendations;
+  }, [aiRecommendations, fallbackRecommendations]);
+
   return (
-    <UserInputContext.Provider value={{ inputs, updateInputs, resetInputs, farm, recommendations, activeCropCycle, cropRisk }}>
+    <UserInputContext.Provider value={{
+      inputs,
+      updateInputs,
+      resetInputs,
+      farm,
+      recommendations: mergedRecommendations,
+      activeCropCycle,
+      cropRisk,
+      loadingAi,
+      refreshAiPredictions
+    }}>
       {children}
     </UserInputContext.Provider>
   );
@@ -88,3 +133,4 @@ export function useUserInput() {
   }
   return context;
 }
+

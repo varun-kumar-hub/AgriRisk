@@ -80,7 +80,7 @@ Instructions:
 4. If the user asked a mixed-language question (e.g. Tamil/Telugu/Hindi mixed with English words), understand their intent and answer in ${langInfo.name}.`;
 
         const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

@@ -14,7 +14,7 @@ import { getCropBenchmarkStats, getHistoricalYieldTrends } from "@/lib/data/hist
 import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export default function CropAdvisorPage() {
-  const { farm, recommendations, inputs } = useUserInput();
+  const { farm, recommendations, inputs, refreshAiPredictions, loadingAi } = useUserInput();
   const toast = useToast();
   const { t, getRiskLevelLabel } = useTranslation();
 
@@ -33,7 +33,7 @@ export default function CropAdvisorPage() {
   const stats = getCropBenchmarkStats(inputs.selectedCrop);
   const trends = getHistoricalYieldTrends(inputs.selectedCrop);
 
-  const handleRunAnalysis = () => {
+  const handleRunAnalysis = async () => {
     setAnalyzing(true);
     setCurrentStepIndex(0);
     setProgressPercent(15);
@@ -42,18 +42,25 @@ export default function CropAdvisorPage() {
     const stepInterval = setInterval(() => {
       setCurrentStepIndex((prev) => {
         const next = prev + 1;
-        setProgressPercent(Math.min(100, (next + 1) * 20));
-
-        if (next >= ANALYSIS_STEPS.length) {
+        setProgressPercent(Math.min(95, (next + 1) * 20));
+        if (next >= ANALYSIS_STEPS.length - 1) {
           clearInterval(stepInterval);
-          setTimeout(() => {
-            setAnalyzing(false);
-            toast.success(t("cropAdvisor.completeToastTitle"), t("cropAdvisor.completeToastDesc"));
-          }, 400);
         }
         return next;
       });
-    }, 450);
+    }, 400);
+
+    try {
+      await refreshAiPredictions();
+    } finally {
+      clearInterval(stepInterval);
+      setCurrentStepIndex(ANALYSIS_STEPS.length - 1);
+      setProgressPercent(100);
+      setTimeout(() => {
+        setAnalyzing(false);
+        toast.success(t("cropAdvisor.completeToastTitle"), t("cropAdvisor.completeToastDesc"));
+      }, 300);
+    }
   };
 
   return (
@@ -67,7 +74,7 @@ export default function CropAdvisorPage() {
           </p>
         </div>
 
-        <Button onClick={handleRunAnalysis} loading={analyzing}>
+        <Button onClick={handleRunAnalysis} loading={analyzing || loadingAi}>
           <RefreshCw size={16} /> {t("cropAdvisor.reAnalyzeFarm")}
         </Button>
       </header>
