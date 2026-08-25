@@ -6,6 +6,14 @@
   color-scheme: light;
 }
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   background: #f8fafc;
   color: #0f172a;
@@ -26,3 +34,11 @@ button:active, a.btn:active {
   transform: scale(0.96);
 }
 
+/* Scrollbar utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

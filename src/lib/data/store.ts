@@ -39,76 +39,112 @@ export const defaultUserInputs: CustomUserInputs = {
   sowingDate: "2026-06-15"
 };
 
+export const ALL_SUPPORTED_CROPS = [
+  // Cereals
+  "rice", "wheat", "maize", "sorghum", "pearl_millet", "finger_millet",
+  // Pulses
+  "chickpea", "pigeon_pea", "green_gram", "black_gram",
+  // Oilseeds
+  "groundnut", "mustard", "soybean", "sunflower", "sesame",
+  // Cash Crops
+  "cotton", "sugarcane", "jute",
+  // Vegetables
+  "tomato", "potato", "onion", "chilli", "brinjal", "okra", "garlic",
+  // Fruits
+  "mango", "banana", "papaya"
+];
+
 export function calculateDynamicCropRecommendations(inputs: CustomUserInputs): CropRecommendation[] {
-  const availableCrops = ["rice", "maize", "chickpea", "groundnut", "cotton"];
+  const evaluated = ALL_SUPPORTED_CROPS.map((cropKey) => {
+    const stats = getCropBenchmarkStats(cropKey);
 
-  return availableCrops.map((cropName) => {
-    const stats = getCropBenchmarkStats(cropName);
-
-    const avgYield = stats ? stats.avgYieldKgPerHa / 1000 : 3.5; // in tonnes/ha
-    const targetN = stats ? stats.avgNReq : 20;
-    const targetP = stats ? stats.avgPReq : 10;
+    const displayName = stats ? stats.crop : cropKey;
+    const avgYield = stats ? stats.avgYieldKgPerHa / 1000 : 3.5;
+    const targetN = stats ? stats.avgNReq : 25;
+    const targetP = stats ? stats.avgPReq : 15;
     const targetK = stats ? stats.avgKReq : 15;
+    const targetPh = stats ? stats.avgPh : 6.5;
     const targetTemp = stats ? stats.avgTempC : 25;
-    const targetRain = stats ? stats.avgRainfallMm : 900;
+    const targetRain = stats ? stats.avgRainfallMm : 800;
 
-    // Soil score based on pH (ideal 6.0-7.0) and NPK sufficiency
-    const phDiff = Math.abs(inputs.soilPh - (stats ? stats.avgPh : 6.5));
-    const phScore = Math.max(50, 100 - phDiff * 20);
+    // 1. Soil pH Suitability (Penalize heavily for acidic/alkaline misalignment)
+    const phDiff = Math.abs(inputs.soilPh - targetPh);
+    const soilPhScore = Math.max(10, Math.min(100, Math.round(100 - phDiff * 32)));
 
-    const nRatio = Math.min(1, inputs.nitrogen / (targetN || 1));
-    const pRatio = Math.min(1, inputs.phosphorus / (targetP || 1));
-    const kRatio = Math.min(1, inputs.potassium / (targetK || 1));
-    const npkScore = Math.round(((nRatio + pRatio + kRatio) / 3) * 100);
+    // 2. N-P-K Nutrients Fit
+    const nScore = Math.min(100, Math.round((inputs.nitrogen / Math.max(1, targetN)) * 100));
+    const pScore = Math.min(100, Math.round((inputs.phosphorus / Math.max(1, targetP)) * 100));
+    const kScore = Math.min(100, Math.round((inputs.potassium / Math.max(1, targetK)) * 100));
+    const npkScore = Math.round((nScore * 0.45) + (pScore * 0.25) + (kScore * 0.30));
 
-    const soilScore = Math.round((phScore + npkScore) / 2);
+    // Soil Type Affinity Bonuses
+    let soilTypeBonus = 0;
+    if (cropKey === "cotton" && inputs.soilType.includes("Black")) soilTypeBonus = 18;
+    if (cropKey === "groundnut" && inputs.soilType.includes("Red")) soilTypeBonus = 18;
+    if (cropKey === "rice" && inputs.soilType.includes("Clay")) soilTypeBonus = 15;
+    if (cropKey === "potato" && inputs.soilType.includes("loam")) soilTypeBonus = 15;
+    if (cropKey === "tomato" && inputs.soilType.includes("loam")) soilTypeBonus = 12;
 
-    // Climate score based on temp & rainfall
+    const soilScore = Math.min(100, Math.max(10, Math.round((soilPhScore * 0.5) + (npkScore * 0.5) + soilTypeBonus)));
+
+    // 3. Water & Rainfall Requirements
+    let waterScore = 70;
+    if (cropKey === "rice" || cropKey === "sugarcane" || cropKey === "banana" || cropKey === "jute") {
+      // High water requirement crops
+      if (inputs.waterAvailability === "High" || inputs.rainfallMm > 950) waterScore = 95;
+      else if (inputs.waterAvailability === "Moderate" && inputs.rainfallMm > 650) waterScore = 70;
+      else waterScore = 20; // Severe penalty for low moisture
+    } else if (cropKey === "pearl_millet" || cropKey === "sorghum" || cropKey === "chickpea" || cropKey === "sesame" || cropKey === "mustard") {
+      // Dryland / drought-tolerant crops
+      if (inputs.waterAvailability === "Low" || inputs.rainfallMm < 650) waterScore = 95;
+      else if (inputs.rainfallMm > 1100) waterScore = 40;
+      else waterScore = 70;
+    } else if (cropKey === "potato" || cropKey === "wheat" || cropKey === "garlic") {
+      // Cool rabi season crops
+      if (inputs.temperatureC <= 22) waterScore = 90;
+      else waterScore = 50;
+    } else {
+      // General crops
+      if (inputs.rainfallMm >= 500 && inputs.rainfallMm <= 950) waterScore = 88;
+      else waterScore = 60;
+    }
+
+    // 4. Climate Temperature Fit
     const tempDiff = Math.abs(inputs.temperatureC - targetTemp);
-    const tempScore = Math.max(40, 100 - tempDiff * 5);
-    const rainRatio = Math.min(1.2, inputs.rainfallMm / (targetRain || 1));
-    const rainScore = Math.min(100, Math.round(rainRatio * 90));
+    const climateScore = Math.max(10, Math.min(100, Math.round(100 - tempDiff * 6)));
 
-    const climateScore = Math.round((tempScore + rainScore) / 2);
+    // Market Demand Score
+    const marketScore = (stats?.category === "Vegetable" || stats?.category === "Fruit") ? 88 : 80;
 
-    // Water score
-    const waterFactor = inputs.waterAvailability === "High" ? 95 : inputs.waterAvailability === "Moderate" ? 75 : 50;
-    const waterScore = waterFactor;
+    // Production & Decision Score
+    const productionScore = Math.round((soilScore * 0.4) + (waterScore * 0.4) + (climateScore * 0.2));
 
-    // Production & Market score
-    const productionScore = Math.round((soilScore * 0.4) + (climateScore * 0.4) + (waterScore * 0.2));
-    const marketScore = 80;
+    const decisionScore = Math.min(98, Math.max(10, Math.round(
+      (soilScore * 0.30) +
+      (waterScore * 0.30) +
+      (climateScore * 0.20) +
+      (marketScore * 0.20)
+    )));
 
-    // Decision Score & Risk Score
-    const decisionScore = Math.round(
-      soilScore * 0.2 +
-      climateScore * 0.2 +
-      waterScore * 0.15 +
-      marketScore * 0.15 +
-      productionScore * 0.3
-    );
-
-    const riskScore = Math.max(10, Math.min(95, 100 - decisionScore));
+    const riskScore = Math.max(5, Math.min(95, 100 - decisionScore));
     let riskLevel: RiskLevel = "MODERATE";
     if (riskScore < 30) riskLevel = "LOW";
     else if (riskScore > 65) riskLevel = "HIGH";
     else if (riskScore > 80) riskLevel = "CRITICAL";
 
-    // Expected yield adjusted by decision score ratio
-    const expectedYield = Math.round(avgYield * (decisionScore / 80) * 10) / 10;
+    const yieldFactor = decisionScore / 80;
+    const expectedYield = Math.max(0.4, Math.round(avgYield * yieldFactor * 10) / 10);
     const expectedRevenue = Math.round(expectedYield * 18000 * inputs.areaAcres);
     const productionCost = Math.round(inputs.areaAcres * 9000);
     const estimatedProfit = expectedRevenue - productionCost;
     const riskAdjustedProfit = Math.round(estimatedProfit * (1 - riskScore / 150));
-
-    const displayName = cropName.charAt(0).toUpperCase() + cropName.slice(1);
 
     return {
       crop: displayName,
       decisionScore,
       riskScore,
       riskLevel,
-      confidence: 0.85,
+      confidence: 0.88,
       expectedYield,
       marketScore,
       climateScore,
@@ -119,10 +155,15 @@ export function calculateDynamicCropRecommendations(inputs: CustomUserInputs): C
       productionCost,
       estimatedProfit,
       riskAdjustedProfit,
-      explanation: `${displayName} scored ${decisionScore}/100 based on your custom soil pH (${inputs.soilPh}), N-P-K levels (${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}), temperature (${inputs.temperatureC}°C), and rainfall (${inputs.rainfallMm}mm).`,
-      whyNot: `Lower score indicates ${displayName} is more constrained by your current ${inputs.waterAvailability.toLowerCase()} water availability or nutrient deficit.`
+      explanation: `${displayName} (${stats?.category || "Crop"}) scored ${decisionScore}/100 based on your custom soil pH (${inputs.soilPh}), N-P-K (${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}), temperature (${inputs.temperatureC}°C), and rainfall (${inputs.rainfallMm}mm) in ${inputs.distName}.`,
+      whyNot: decisionScore < 60
+        ? `High risk constraint for ${displayName} under current ${inputs.waterAvailability.toLowerCase()} water availability and temperature ${inputs.temperatureC}°C.`
+        : `Minor nutrient or weather fluctuation constraint.`
     };
-  }).sort((a, b) => b.decisionScore - a.decisionScore);
+  });
+
+  // Return top 6 best-fitting crops sorted by decisionScore descending
+  return evaluated.sort((a, b) => b.decisionScore - a.decisionScore).slice(0, 6);
 }
 
 export function getDynamicFarm(inputs: CustomUserInputs): Farm {
@@ -161,7 +202,7 @@ export function getDynamicCropCycle(inputs: CustomUserInputs): CropCycle {
 
 export function getDynamicCropRisk(inputs: CustomUserInputs): CropRisk {
   const recs = calculateDynamicCropRecommendations(inputs);
-  const selectedRec = recs.find((r) => r.crop.toLowerCase() === inputs.selectedCrop.toLowerCase()) || recs[0];
+  const selectedRec = recs.find((r) => r.crop.toLowerCase().includes(inputs.selectedCrop.toLowerCase())) || recs[0];
 
   return {
     overallScore: selectedRec.riskScore,

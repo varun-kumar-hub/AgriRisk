@@ -32,12 +32,12 @@ Analyse the following real-time farm profile & soil parameters:
 - Selected Crop: ${inputs.selectedCrop}
 
 Task:
-Evaluate suitability for candidate crops (e.g. Rice, Maize, Chickpea, Groundnut, Cotton, Wheat, Sugarcane, Sorghum) specifically for ${inputs.distName}, ${inputs.stateName}.
+Evaluate suitability across ALL Indian agricultural crop categories including Cereals (Rice, Wheat, Maize, Sorghum, Bajra), Pulses (Chickpea, Pigeon Pea, Moong, Urad), Oilseeds (Groundnut, Mustard, Soybean, Sunflower, Sesame), Cash Crops (Cotton, Sugarcane, Jute), Vegetables (Tomato, Potato, Onion, Chilli, Brinjal, Okra, Garlic), and Fruits (Mango, Banana, Papaya, Watermelon) specifically for ${inputs.distName}, ${inputs.stateName}.
 
-Generate an array of 5 top recommended crops in JSON format matching this JSON schema:
+Generate an array of 6 top recommended crops from these diverse categories in JSON format matching this JSON schema:
 [
   {
-    "crop": "Crop Name in English (e.g. Rice, Maize, Groundnut, Cotton, Chickpea)",
+    "crop": "Crop Name (e.g. Tomato, Potato, Groundnut, Wheat, Rice, Cotton, Banana, Chickpea)",
     "decisionScore": 85, (integer 1-100)
     "riskScore": 25, (integer 1-100)
     "riskLevel": "LOW" | "MODERATE" | "HIGH" | "CRITICAL",

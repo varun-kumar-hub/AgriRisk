@@ -350,11 +350,46 @@ export function CustomInputPanel() {
             onChange={(e) => updateInputs({ selectedCrop: e.target.value })}
             className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold focus:border-crop focus:outline-none focus:ring-2 focus:ring-crop/20 capitalize"
           >
-            <option value="rice">{getCropName("rice")}</option>
-            <option value="maize">{getCropName("maize")}</option>
-            <option value="chickpea">{getCropName("chickpea")}</option>
-            <option value="groundnut">{getCropName("groundnut")}</option>
-            <option value="cotton">{getCropName("cotton")}</option>
+            <optgroup label="🌾 Cereals & Grains">
+              <option value="rice">Rice (Paddy)</option>
+              <option value="wheat">Wheat</option>
+              <option value="maize">Maize (Corn)</option>
+              <option value="sorghum">Sorghum (Jowar)</option>
+              <option value="pearl_millet">Pearl Millet (Bajra)</option>
+              <option value="finger_millet">Finger Millet (Ragi)</option>
+            </optgroup>
+            <optgroup label="🌱 Pulses & Legumes">
+              <option value="chickpea">Chickpea (Gram)</option>
+              <option value="pigeon_pea">Pigeon Pea (Tur/Arhar)</option>
+              <option value="green_gram">Green Gram (Moong)</option>
+              <option value="black_gram">Black Gram (Urad)</option>
+            </optgroup>
+            <optgroup label="🌻 Oilseeds">
+              <option value="groundnut">Groundnut (Peanut)</option>
+              <option value="mustard">Mustard / Rapeseed</option>
+              <option value="soybean">Soybean</option>
+              <option value="sunflower">Sunflower</option>
+              <option value="sesame">Sesame (Til)</option>
+            </optgroup>
+            <optgroup label="💵 Cash & Industrial Crops">
+              <option value="cotton">Cotton</option>
+              <option value="sugarcane">Sugarcane</option>
+              <option value="jute">Jute</option>
+            </optgroup>
+            <optgroup label="🍅 Vegetables & Commercial">
+              <option value="tomato">Tomato</option>
+              <option value="potato">Potato</option>
+              <option value="onion">Onion</option>
+              <option value="chilli">Chilli (Red/Green)</option>
+              <option value="brinjal">Brinjal (Eggplant)</option>
+              <option value="okra">Okra (Lady Finger)</option>
+              <option value="garlic">Garlic</option>
+            </optgroup>
+            <optgroup label="🥭 Fruits & Horticulture">
+              <option value="mango">Mango</option>
+              <option value="banana">Banana</option>
+              <option value="papaya">Papaya</option>
+            </optgroup>
           </select>
         </div>
       </div>
