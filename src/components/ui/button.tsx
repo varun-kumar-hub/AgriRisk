@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Loader2 } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -9,7 +9,6 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
-  showClickFeedback?: boolean;
 }
 
 export function Button({
@@ -18,38 +17,25 @@ export function Button({
   variant = "primary",
   size = "md",
   loading = false,
-  showClickFeedback = true,
   onClick,
   disabled,
   ...props
 }: ButtonProps) {
-  const [internalLoading, setInternalLoading] = useState(false);
-
-  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (disabled || loading || internalLoading) return;
-
-    if (showClickFeedback && onClick) {
-      setInternalLoading(true);
-      try {
-        await Promise.resolve(onClick(e));
-      } finally {
-        setTimeout(() => setInternalLoading(false), 300);
-      }
-    } else if (onClick) {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (disabled || loading) return;
+    if (onClick) {
       onClick(e);
     }
   };
 
-  const isSpinnerVisible = loading || internalLoading;
-
   const baseStyles =
-    "inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-150 active:scale-95 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100 select-none shadow-sm focus:outline-none focus:ring-2 focus:ring-crop/50";
+    "inline-flex items-center justify-center font-semibold rounded-lg transition-transform duration-75 active:scale-95 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100 select-none shadow-sm focus:outline-none focus:ring-2 focus:ring-crop/50";
 
   const variants = {
     primary: "bg-crop text-white hover:bg-crop/90 shadow-emerald-900/10",
     secondary: "bg-slate-900 text-white hover:bg-slate-800",
     outline: "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50",
-    ghost: "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 shadow-none",
+    ghost: "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-950 shadow-none",
     danger: "bg-red-600 text-white hover:bg-red-700"
   };
 
@@ -62,11 +48,11 @@ export function Button({
   return (
     <button
       onClick={handleClick}
-      disabled={disabled || isSpinnerVisible}
+      disabled={disabled || loading}
       className={twMerge(clsx(baseStyles, variants[variant], sizes[size], className))}
       {...props}
     >
-      {isSpinnerVisible && <Loader2 className="animate-spin" size={size === "sm" ? 14 : 16} />}
+      {loading && <Loader2 className="animate-spin" size={size === "sm" ? 14 : 16} />}
       {children}
     </button>
   );

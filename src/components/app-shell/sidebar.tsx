@@ -68,11 +68,7 @@ export function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [navigatingHref, setNavigatingHref] = useState<string | null>(null);
 
-  const handleNavClick = (href: string) => {
-    if (href !== pathname) {
-      setNavigatingHref(href);
-      setTimeout(() => setNavigatingHref(null), 800);
-    }
+  const handleNavClick = () => {
     setMobileOpen(false);
   };
 
