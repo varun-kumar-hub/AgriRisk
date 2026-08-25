@@ -19,8 +19,11 @@ import {
   Menu,
   Sprout,
   Tractor,
-  X
+  X,
+  LogIn,
+  LogOut
 } from "lucide-react";
+import { useAuth } from "@/components/providers/auth-provider";
 
 const groups = [
   { label: "Overview", items: [{ href: "/dashboard", label: "Dashboard", icon: Home }] },
@@ -57,6 +60,7 @@ const groups = [
 ];
 
 export function Sidebar() {
+  const { user, signOut } = useAuth();
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -179,10 +183,36 @@ export function Sidebar() {
           </nav>
         </div>
 
-        {/* Footer */}
-        <div className={`border-t border-slate-100 pt-3 text-xs font-semibold text-slate-400 flex items-center ${isCollapsed ? "justify-center" : "justify-between px-2"}`}>
-          {!isCollapsed && <span>AgriRisk v2.0 Platform</span>}
-          <span className="size-2 rounded-full bg-emerald-500 animate-pulse" title="Platform Active" />
+        {/* Auth User Profile Footer */}
+        <div className="border-t border-slate-100 pt-3">
+          {user ? (
+            <div className={`flex items-center gap-2 ${isCollapsed ? "justify-center" : "px-2"}`}>
+              <div className="size-8 rounded-full bg-crop text-white font-bold grid place-items-center text-xs shadow-sm uppercase shrink-0">
+                {user.email?.[0] || "U"}
+              </div>
+              {!isCollapsed && (
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-slate-900 truncate">{user.email}</p>
+                  <button
+                    onClick={() => signOut()}
+                    className="text-[11px] font-semibold text-slate-400 hover:text-red-600 transition-colors flex items-center gap-1 mt-0.5"
+                  >
+                    <LogOut size={12} /> Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/auth/login"
+              className={`flex items-center gap-2 rounded-xl bg-crop text-white font-bold text-xs py-2 px-3 shadow-md hover:bg-crop/90 active:scale-95 transition-all cursor-pointer ${
+                isCollapsed ? "justify-center" : "justify-center"
+              }`}
+            >
+              <LogIn size={15} />
+              {!isCollapsed && <span>Sign In / Register</span>}
+            </Link>
+          )}
         </div>
       </aside>
     </>
