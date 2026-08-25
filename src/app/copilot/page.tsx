@@ -38,7 +38,7 @@ interface Message {
 export default function CopilotPage() {
   const { farm, activeCropCycle, cropRisk, inputs } = useUserInput();
   const { language, t, getCropName } = useTranslation();
-  const { addToast } = useToast();
+  const toast = useToast();
 
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
@@ -133,7 +133,7 @@ export default function CopilotPage() {
       setMessages((prev) => [...prev, aiMsg]);
     } catch (err) {
       console.error("Copilot API query failed:", err);
-      addToast({ type: "error", title: "Query Failed", message: "Could not reach AgriRisk AI server." });
+      toast.error("Query Failed", "Could not reach AgriRisk AI server.");
     } finally {
       setLoading(false);
     }
@@ -146,7 +146,7 @@ export default function CopilotPage() {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      addToast({ type: "warning", title: "Voice Not Supported", message: "Your browser does not support voice dictation." });
+      toast.warning("Voice Not Supported", "Your browser does not support voice dictation.");
       return;
     }
 
@@ -201,14 +201,14 @@ export default function CopilotPage() {
   const handleCopyText = (msgId: string, text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(msgId);
-    addToast({ type: "success", title: "Copied!", message: "Advice copied to clipboard." });
+    toast.success("Copied!", "Advice copied to clipboard.");
     setTimeout(() => setCopiedId(null), 2000);
   };
 
   // Reset conversation
   const handleClearChat = () => {
     setMessages([]);
-    addToast({ type: "info", title: "Chat Reset", message: "Conversation history cleared." });
+    toast.info("Chat Reset", "Conversation history cleared.");
   };
 
   return (
