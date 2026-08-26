@@ -17,12 +17,12 @@ export default function DashboardPage() {
 
   // Dynamic real-time alerts based on live inputs
   const dynamicAlerts = [];
-  if (inputs.nitrogen < 25) {
+  if (inputs.cropAge > 90) {
     dynamicAlerts.push({
-      id: "alert-n",
-      title: "Nitrogen Deficit Stress",
-      severity: "HIGH" as const,
-      description: `Current Soil N level is ${inputs.nitrogen} kg/ha (Target: 40 kg/ha). Apply urea split dose.`
+      id: "alert-age",
+      title: "Late Stage Crop Warning",
+      severity: "MODERATE" as const,
+      description: `Current Crop Age is ${inputs.cropAge} Days. Prepare for grain filling and harvest management.`
     });
   }
   if (inputs.waterAvailability === "Low" || inputs.rainfallMm < 600) {
@@ -132,7 +132,7 @@ export default function DashboardPage() {
             {t("dashboard.aiInsight")}
           </CardTitle>
           <p className="mt-4 text-base leading-7 text-slate-700 font-medium">
-            Based on real-time soil N-P-K ({inputs.nitrogen}-{inputs.phosphorus}-{inputs.potassium} kg/ha), pH {inputs.soilPh}, temperature {inputs.temperatureC}°C, and precipitation {inputs.rainfallMm} mm in {inputs.distName}, {inputs.stateName}: <strong>{getCropName(inputs.selectedCrop)}</strong> presents an overall risk score of {cropRisk.overallScore}/100.
+            Based on real-time soil pH {inputs.soilPh}, Crop Age {inputs.cropAge || 45} Days, temperature {inputs.temperatureC}°C, and precipitation {inputs.rainfallMm} mm in {inputs.distName}, {inputs.stateName}: <strong>{getCropName(inputs.selectedCrop)}</strong> presents an overall risk score of {cropRisk.overallScore}/100.
           </p>
           <Link href="/risk" className="mt-5 inline-flex rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800 transition-colors">
             {t("dashboard.viewAnalysis")}

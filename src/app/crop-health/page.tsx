@@ -13,7 +13,7 @@ export default function CropHealthPage() {
 
   // Calculate dynamic vegetation health metrics based on soil & weather inputs
   const ndviIndex = Math.round((0.78 - (cropRisk.overallScore / 100) * 0.25) * 100) / 100;
-  const leafChlorophyll = Math.round(42 - (inputs.temperatureC > 30 ? 6 : 0) - (inputs.nitrogen < 15 ? 8 : 0));
+  const leafChlorophyll = Math.round(42 - (inputs.temperatureC > 30 ? 6 : 0) - ((inputs.cropAge || 45) > 90 ? 4 : 0));
   const canopyCoverPct = Math.min(95, Math.max(40, 75 - (inputs.rainfallMm < 400 ? 15 : 0)));
 
   return (
@@ -33,7 +33,7 @@ export default function CropHealthPage() {
         <MetricCard title={t("cropHealth.ndviIndex")} value={ndviIndex.toString()} detail={t("cropHealth.ndviRange")}>
           <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">{t("cropHealth.healthyCanopy")}</span>
         </MetricCard>
-        <MetricCard title={t("cropHealth.leafChlorophyll")} value={`${leafChlorophyll} SPAD`} detail={t("cropHealth.soilNitrogen", { n: inputs.nitrogen })}>
+        <MetricCard title={t("cropHealth.leafChlorophyll")} value={`${leafChlorophyll} SPAD`} detail={`Crop Age: ${inputs.cropAge || 45} Days`}>
           <span className="text-xs font-bold text-crop bg-crop/10 px-2 py-0.5 rounded-md">{t("cropHealth.goodVigour")}</span>
         </MetricCard>
         <MetricCard title={t("cropHealth.canopyCoverage")} value={`${canopyCoverPct}%`} detail={`${t("common.stage")}: ${getGrowthStageLabel(activeCropCycle.stage)}`}>
@@ -63,7 +63,7 @@ export default function CropHealthPage() {
                   </span>
                   <div>
                     <h3 className="font-bold text-slate-900">{t("cropHealth.nutrientAbsorption")}</h3>
-                    <p className="text-xs text-slate-500">N-P-K: {inputs.nitrogen}-{inputs.phosphorus}-{inputs.potassium} kg/ha</p>
+                    <p className="text-xs text-slate-500">Crop Age: {inputs.cropAge || 45} Days</p>
                   </div>
                 </div>
                 <span className="flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full">

@@ -109,7 +109,7 @@ export default function CropAdvisorPage() {
             <div className="flex justify-between gap-4"><dt className="text-slate-500">{t("common.location")}</dt><dd className="font-semibold">{farm.location}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-slate-500">{t("common.area")}</dt><dd className="font-semibold">{farm.areaAcres} {t("farms.acres")}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-slate-500">{t("farms.soilPh")}</dt><dd className="font-semibold">{inputs.soilPh} / {farm.soilType}</dd></div>
-            <div className="flex justify-between gap-4"><dt className="text-slate-500">Soil N-P-K</dt><dd className="font-semibold">{inputs.nitrogen}-{inputs.phosphorus}-{inputs.potassium} kg/ha</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-slate-500">Crop Age</dt><dd className="font-semibold">{inputs.cropAge || 45} Days</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-slate-500">{t("customInput.waterAvailability")}</dt><dd className="font-semibold">{getRiskLevelLabel(inputs.waterAvailability)}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-slate-500">{t("common.temp")} / {t("common.rain")}</dt><dd className="font-semibold">{inputs.temperatureC}°C / {inputs.rainfallMm}mm</dd></div>
           </dl>
