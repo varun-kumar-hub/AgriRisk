@@ -13,7 +13,6 @@ import {
   Copy,
   Check,
   RotateCcw,
-  Sprout,
   FlaskConical,
   Bug,
   Droplets,
@@ -49,37 +48,85 @@ export default function CopilotPage() {
 
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Initialize initial welcoming AI message on mount or when context changes
-  useEffect(() => {
-    if (messages.length === 0) {
-      setMessages([
-        {
-          id: "msg-welcome",
-          sender: "ai",
-          text: `🌱 **Welcome to AgriRisk AI Copilot!**\n\nI am your real-time agricultural AI assistant connected to your farm in **${inputs.distName}, ${inputs.stateName}**.\n\n• **Active Target Crop:** ${getCropName(inputs.selectedCrop)}\n• **Soil Health:** pH ${inputs.soilPh} · N-P-K ${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium} kg/ha\n• **Weather:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}mm rain\n\nAsk me **ANY agricultural question** — from N-P-K fertilizer schedules, pest/disease identification, organic sprays, irrigation, market prices, to PM-KISAN government schemes!`,
-          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          followUps: [
-            `What is the best fertilizer dose for ${getCropName(inputs.selectedCrop)}?`,
-            `How to prevent pest attacks in ${inputs.distName}?`,
-            `What government subsidies apply in ${inputs.stateName}?`
-          ]
-        }
-      ]);
+  // Multi-lingual welcome message generator
+  const getWelcomeText = (lang: string) => {
+    const crop = getCropName(inputs.selectedCrop);
+    if (lang === "ta") {
+      return `🌱 **அக்ரிரிலாஜிக் AI உதவியாளருக்கு நல்வரவு!**\n\nநான் உங்கள் **${inputs.distName}, ${inputs.stateName}** பண்ணையுடன் இணைக்கப்பட்டுள்ள AI வேளாண் உதவியாளர்.\n\n• **பயிர்:** ${crop}\n• **மண் pH:** ${inputs.soilPh} (N-P-K: ${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium})\n• **வானிலை:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}மிமீ மழை\n\nஉர அளவு, பூச்சி மேலாண்மை, பாசனம் அல்லது அரசு திட்டங்கள் பற்றி எந்த கேள்வியும் கேட்கலாம்!`;
+    } else if (lang === "te") {
+      return `🌱 **అగ్రిరిస్క్ AI అసిస్టెంట్‌కి స్వాగతం!**\n\nనేను మీ **${inputs.distName}, ${inputs.stateName}** పొలంతో అనుసంధానించబడిన AI వ్యవసాయ సహాయకుడిని.\n\n• **పంట:** ${crop}\n• **నేల pH:** ${inputs.soilPh} (N-P-K: ${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium})\n• **వాతావరణం:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}మి.మీ వర్షపాతం\n\nఎరువుల మోతాదు, పురుగుల నివారణ, నీటి పారుదల లేదా ప్రభుత్వ పథకాల గురించి ఏ ప్రశ్లనైనా అడగండి!`;
+    } else if (lang === "kn") {
+      return `🌱 **ಅಗ್ರಿರಿಸ್ಕ್ AI ಸಹಾಯಕರಾಗಿ ಸುಸ್ವಾಗತ!**\n\nನಾನು ನಿಮ್ಮ **${inputs.distName}, ${inputs.stateName}** ಹೊಲಕ್ಕೆ ಸಂಪರ್ಕಗೊಂಡಿರುವ AI ಕೃಷಿ ಸಹಾಯಕರಾಗಿದ್ದೇನೆ.\n\n• **ಬೆಳೆ:** ${crop}\n• **ಮಣ್ಣಿನ pH:** ${inputs.soilPh}\n• **ಹವಾಮಾನ:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}ಮಿಮೀ ಮಳೆ\n\nಗೊಬ್ಬರದ ಪ್ರಮಾಣ, ಕೀಟ ನಿಯಂತ್ರಣ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ಯಾವುದೇ ಪ್ರಶ್ನೆ ಕೇಳಿ!`;
+    } else if (lang === "hi") {
+      return `🌱 **एग्रीरिस्क AI सहायक में आपका स्वागत है!**\n\nमैं **${inputs.distName}, ${inputs.stateName}** के आपके खेत से जुड़ा कृषि AI सहायक हूँ।\n\n• **फसल:** ${crop}\n• **मिट्टी pH:** ${inputs.soilPh} (N-P-K: ${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium})\n• **मौसम:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}मीमी बारिश\n\nउर्वरक मात्रा, कीट नियंत्रण, सिंचाई या सरकारी योजनाओं के बारे में कोई भी प्रश्न पूछें!`;
     }
-  }, [inputs.distName, inputs.stateName, inputs.selectedCrop]);
+    return `🌱 **Welcome to AgriRisk AI Copilot!**\n\nI am your real-time agricultural AI assistant connected to your farm in **${inputs.distName}, ${inputs.stateName}**.\n\n• **Active Target Crop:** ${crop}\n• **Soil Health:** pH ${inputs.soilPh} · N-P-K ${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium} kg/ha\n• **Weather:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}mm rain\n\nAsk me **ANY agricultural question** — from N-P-K fertilizer schedules, pest/disease identification, organic sprays, irrigation, market prices, to PM-KISAN government schemes!`;
+  };
+
+  const getWelcomeFollowUps = (lang: string) => {
+    const crop = getCropName(inputs.selectedCrop);
+    if (lang === "ta") return [`${crop} பயிருக்கு உகந்த உரம் எது?`, `${inputs.distName} பகுதியில் பூச்சி தாக்குதலை தடுப்பது எப்படி?`, `அரசு பயிர் காப்பீடு பெறுவது எப்படி?`];
+    if (lang === "te") return [`${crop} పంటకు అనుకూలమైన ఎరువులు ఏమిటి?`, `${inputs.distName} లో తెగుళ్లను ఎలా అరికట్టాలి?`, `ప్రభుత్వ పంటల భీమా పథకం వివరాలు?`];
+    if (lang === "kn") return [`${crop} ಬೆಳೆಗೆ ಉತ್ತಮ ಗೊಬ್ಬರ ಯಾವುದು?`, `${inputs.distName} ನಲ್ಲಿ ಕೀಟ ನಿಯಂತ್ರಣ ಹೇಗೆ?`, `ಸರ್ಕಾರಿ ಬೆಳೆ ವಿಮೆ ವಿವರಗಳು?`];
+    if (lang === "hi") return [`${crop} के लिए सबसे अच्छी खाद कौन सी है?`, `${inputs.distName} में कीटों से बचाव कैसे करें?`, `सरकारी फसल बीमा योजना की जानकारी?`];
+    return [`What is the best fertilizer dose for ${crop}?`, `How to prevent pest attacks in ${inputs.distName}?`, `What government subsidies apply in ${inputs.stateName}?`];
+  };
+
+  // Re-generate welcome message whenever language or context updates
+  useEffect(() => {
+    setMessages([
+      {
+        id: "msg-welcome",
+        sender: "ai",
+        text: getWelcomeText(language),
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        followUps: getWelcomeFollowUps(language)
+      }
+    ]);
+  }, [language, inputs.distName, inputs.stateName, inputs.selectedCrop]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // Topic Shortcuts
-  const topicCategoryChips = [
-    { label: "Soil & Fertilizers", icon: FlaskConical, query: `What is the optimal N-P-K fertilizer and compost schedule for soil pH ${inputs.soilPh}?` },
-    { label: "Pest & Disease Control", icon: Bug, query: `How to identify and cure common fungal & pest attacks on ${getCropName(inputs.selectedCrop)}?` },
-    { label: "Irrigation & Water", icon: Droplets, query: `What is the ideal drip irrigation and watering schedule for ${inputs.rainfallMm}mm rainfall?` },
-    { label: "Govt Schemes & MSP", icon: Landmark, query: `What government subsidies (PM-KISAN, PMFBY, Soil Health Card) are active in ${inputs.stateName}?` },
-    { label: "Weather Impact", icon: CloudSun, query: `How does ${inputs.temperatureC}°C temperature affect ${getCropName(inputs.selectedCrop)} yield in ${inputs.distName}?` }
-  ];
+  // Topic Shortcuts per language
+  const getTopicCategoryChips = (lang: string) => {
+    const crop = getCropName(inputs.selectedCrop);
+    if (lang === "ta") {
+      return [
+        { label: "மண் & உரம்", icon: FlaskConical, query: `${crop} பயிருக்கு pH ${inputs.soilPh} மண்ணிற்கு உகந்த N-P-K உரம் அளவு என்ன?` },
+        { label: "பூச்சி மேலாண்மை", icon: Bug, query: `${crop} பயிரில் இலை மஞ்சள் நிறமாவதை தடுப்பது எப்படி?` },
+        { label: "நீர்ப்பாசனம்", icon: Droplets, query: `${inputs.rainfallMm}மிமீ மழையளவுக்கு ஏற்ற பாசன முறை என்ன?` },
+        { label: "அரசு திட்டங்கள்", icon: Landmark, query: `${inputs.stateName} மாநிலத்தில் உள்ள விவசாய அரசு திட்டங்கள் யாவை?` },
+        { label: "வானிலை தாக்கம்", icon: CloudSun, query: `${inputs.temperatureC}°C வெப்பநிலை ${crop} பயிரை எவ்வாறு பாதிக்கும்?` }
+      ];
+    } else if (lang === "te") {
+      return [
+        { label: "నేల & ఎరువులు", icon: FlaskConical, query: `${crop} పంటకు నేల pH ${inputs.soilPh} వద్ద ఎరువుల మోతాదు ఎంత?` },
+        { label: "తెగుళ్ల నివారణ", icon: Bug, query: `${crop} పంటలో ఆకులు పసుపు రంగులోకి మారితే ఏం చేయాలి?` },
+        { label: "నీటి యాజమాన్యం", icon: Droplets, query: `${inputs.rainfallMm}మి.మీ వర్షపాతానికి అనుకూలమైన నీటి పారుదల?` },
+        { label: "ప్రభుత్వ పథకాలు", icon: Landmark, query: `${inputs.stateName} లో రైతులకు అందుబాటులో ఉన్న పథకాలు?` },
+        { label: "వాతావరణ ముప్పు", icon: CloudSun, query: `${inputs.temperatureC}°C ఉష్ణోగ్రత ${crop} పంటపై చూపించే ప్రభావం?` }
+      ];
+    } else if (lang === "hi") {
+      return [
+        { label: "मिट्टी और उर्वरक", icon: FlaskConical, query: `${crop} के लिए मिट्टी pH ${inputs.soilPh} पर सही N-P-K मात्रा क्या है?` },
+        { label: "कीट नियंत्रण", icon: Bug, query: `${crop} में पीली पत्तियों का इलाज और कीट नियंत्रण कैसे करें?` },
+        { label: "सिंचाई प्रबंधन", icon: Droplets, query: `${inputs.rainfallMm}मीमी बारिश के लिए आदर्श सिंचाई अनुसूची क्या है?` },
+        { label: "सरकारी योजनाएं", icon: Landmark, query: `${inputs.stateName} में किसानों के लिए प्रमुख योजनाएं कौन सी हैं?` },
+        { label: "मौसम प्रभाव", icon: CloudSun, query: `${inputs.temperatureC}°C तापमान का ${crop} पैदावार पर क्या प्रभाव पड़ेगा?` }
+      ];
+    }
+    return [
+      { label: "Soil & Fertilizers", icon: FlaskConical, query: `What is the optimal N-P-K fertilizer schedule for soil pH ${inputs.soilPh}?` },
+      { label: "Pest & Disease Control", icon: Bug, query: `How to identify and cure common fungal & pest attacks on ${crop}?` },
+      { label: "Irrigation & Water", icon: Droplets, query: `What is the ideal drip irrigation and watering schedule for ${inputs.rainfallMm}mm rainfall?` },
+      { label: "Govt Schemes & MSP", icon: Landmark, query: `What government subsidies (PM-KISAN, PMFBY) are active in ${inputs.stateName}?` },
+      { label: "Weather Impact", icon: CloudSun, query: `How does ${inputs.temperatureC}°C temperature affect ${crop} yield in ${inputs.distName}?` }
+    ];
+  };
+
+  const topicCategoryChips = getTopicCategoryChips(language);
 
   const handleSend = async (customQuery?: string) => {
     const query = (customQuery || question).trim();
@@ -217,11 +264,11 @@ export default function CopilotPage() {
       <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-crop">
-            <Bot size={16} /> AgriRisk AI Copilot
+            <Bot size={16} /> AgriRisk AI Copilot ({language.toUpperCase()})
           </div>
-          <h1 className="mt-1 text-3xl font-extrabold text-slate-950">AI Agricultural Assistant</h1>
+          <h1 className="mt-1 text-3xl font-extrabold text-slate-950">{t("copilot.title")}</h1>
           <p className="mt-1 text-sm text-slate-600">
-            Ask any question on soil health, fertilizer N-P-K, pests, irrigation, or government schemes.
+            {t("copilot.subtitle")}
           </p>
         </div>
 
@@ -231,7 +278,7 @@ export default function CopilotPage() {
           </Button>
           <div className="flex items-center gap-1.5 rounded-full border bg-emerald-50 px-3 py-1 text-xs font-extrabold text-emerald-800">
             <Sparkles size={14} className="text-emerald-600 animate-spin" />
-            Gemini 2.5 Flash Live
+            Gemini 2.5 Flash Live ({language.toUpperCase()})
           </div>
         </div>
       </header>
@@ -369,7 +416,7 @@ export default function CopilotPage() {
               </span>
               <div className="rounded-2xl rounded-tl-none border border-slate-200 bg-white p-4 text-xs font-semibold text-slate-600 shadow-sm flex items-center gap-2">
                 <span className="size-2 rounded-full bg-crop animate-ping" />
-                AgriRisk AI is analyzing soil pH, N-P-K, and weather context...
+                AgriRisk AI is analyzing soil pH, N-P-K, and weather context in {language.toUpperCase()}...
               </div>
             </div>
           )}
