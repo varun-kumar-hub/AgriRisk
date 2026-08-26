@@ -17,7 +17,6 @@ import {
   Lightbulb,
   LineChart,
   Map,
-  Menu,
   Sprout,
   Tractor,
   TrendingUp,
@@ -30,14 +29,18 @@ import { useTranslation } from "@/lib/i18n/i18n-context";
 import { ProfilePopover } from "@/components/app-shell/profile-popover";
 import { SignOutModal } from "@/components/modals/signout-modal";
 
-export function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onCloseMobile?: () => void;
+}
+
+export function Sidebar({ mobileOpen = false, onCloseMobile }: SidebarProps) {
   const auth = useAuth();
   const user = auth?.user ?? null;
   const signOut = auth?.signOut ?? (async () => ({ error: null }));
   const pathname = usePathname();
   const { t } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [signOutModalOpen, setSignOutModalOpen] = useState(false);
@@ -83,7 +86,7 @@ export function Sidebar() {
   ];
 
   const handleNavClick = () => {
-    setMobileOpen(false);
+    if (onCloseMobile) onCloseMobile();
   };
 
   const handleConfirmSignOut = async () => {
@@ -93,29 +96,11 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile Top Header Toggle Bar */}
-      <div className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-slate-200 bg-white/90 px-4 backdrop-blur-md lg:hidden">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="grid size-8 place-items-center rounded-lg bg-crop text-white shadow-sm">
-            <Sprout size={18} />
-          </span>
-          <span className="font-bold text-base text-slate-950">AgriRisk</span>
-        </Link>
-
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="rounded-lg border border-slate-300 p-2 text-slate-700 hover:bg-slate-100 active:scale-95 cursor-pointer"
-          aria-label="Toggle navigation menu"
-        >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      </div>
-
       {/* Backdrop overlay for mobile drawer */}
       {mobileOpen && (
         <div
-          onClick={() => setMobileOpen(false)}
-          className="fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-sm lg:hidden animate-in fade-in"
+          onClick={onCloseMobile}
+          className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm lg:hidden animate-in fade-in duration-200"
         />
       )}
 
@@ -125,17 +110,17 @@ export function Sidebar() {
           isCollapsed ? "w-20 px-2" : "w-64 px-4"
         } ${
           mobileOpen
-            ? "fixed inset-y-0 left-0 z-50 w-64 translate-x-0 shadow-2xl"
+            ? "fixed inset-y-0 left-0 z-50 w-72 translate-x-0 shadow-2xl"
             : "hidden lg:flex"
         }`}
       >
         {/* Fixed Header Section */}
         <div className="shrink-0 flex items-center justify-between px-1 pb-3 border-b border-slate-100">
-          <Link href="/dashboard" className="flex items-center gap-3">
+          <Link href="/dashboard" onClick={handleNavClick} className="flex items-center gap-3">
             <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-crop text-white shadow-md">
               <Sprout size={22} />
             </span>
-            {!isCollapsed && (
+            {(!isCollapsed || mobileOpen) && (
               <span className="animate-in fade-in duration-200">
                 <span className="block text-lg font-bold text-slate-950">AgriRisk</span>
                 <span className="text-xs text-slate-500 font-medium">{t("common.tagline")}</span>
@@ -143,26 +128,36 @@ export function Sidebar() {
             )}
           </Link>
 
-          {/* Desktop Collapse / Expand Toggle Icon */}
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hidden lg:grid size-8 place-items-center rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-950 active:scale-95 cursor-pointer transition-all"
-            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          >
-            {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-          </button>
+          {/* Desktop Collapse Toggle / Mobile Close Drawer Button */}
+          {mobileOpen ? (
+            <button
+              onClick={onCloseMobile}
+              className="grid size-8 place-items-center rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 cursor-pointer lg:hidden"
+              aria-label="Close menu"
+            >
+              <X size={18} />
+            </button>
+          ) : (
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="hidden lg:grid size-8 place-items-center rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-950 active:scale-95 cursor-pointer transition-all"
+              title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+            >
+              {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            </button>
+          )}
         </div>
 
         {/* Scrollable Navigation Body */}
         <nav className="flex-1 overflow-y-auto space-y-4 my-3 pr-0.5 scrollbar-none">
           {groups.map((group, idx) => (
             <div key={idx}>
-              {group.label && !isCollapsed && (
+              {group.label && (!isCollapsed || mobileOpen) && (
                 <p className="px-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
                   {group.label}
                 </p>
               )}
-              {group.label && isCollapsed && (
+              {group.label && isCollapsed && !mobileOpen && (
                 <div className="my-2 border-t border-slate-100" />
               )}
               <div className="mt-1 space-y-1">
@@ -174,9 +169,9 @@ export function Sidebar() {
                       key={item.href}
                       href={item.href}
                       onClick={handleNavClick}
-                      title={isCollapsed ? item.label : undefined}
+                      title={isCollapsed && !mobileOpen ? item.label : undefined}
                       className={`flex items-center rounded-xl py-2.5 text-sm font-semibold transition-all duration-75 active:scale-95 cursor-pointer ${
-                        isCollapsed ? "justify-center px-0" : "justify-between px-3"
+                        isCollapsed && !mobileOpen ? "justify-center px-0" : "justify-between px-3"
                       } ${
                         isActive
                           ? "bg-crop/15 text-crop font-bold shadow-sm"
@@ -185,7 +180,7 @@ export function Sidebar() {
                     >
                       <div className="flex items-center gap-3">
                         <item.icon size={19} className={isActive ? "text-crop shrink-0" : "text-slate-400 shrink-0"} />
-                        {!isCollapsed && <span className="truncate">{item.label}</span>}
+                        {(!isCollapsed || mobileOpen) && <span className="truncate">{item.label}</span>}
                       </div>
                     </Link>
                   );
@@ -202,14 +197,14 @@ export function Sidebar() {
               <button
                 onClick={() => setPopoverOpen(!popoverOpen)}
                 className={`flex w-full items-center gap-3 rounded-2xl p-2 transition-all hover:bg-slate-100 active:scale-95 cursor-pointer text-left ${
-                  isCollapsed ? "justify-center" : "justify-between"
+                  isCollapsed && !mobileOpen ? "justify-center" : "justify-between"
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="size-9 rounded-xl bg-crop text-white font-bold grid place-items-center text-sm shadow-sm uppercase shrink-0">
                     {user.email?.[0] || "U"}
                   </div>
-                  {!isCollapsed && (
+                  {(!isCollapsed || mobileOpen) && (
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-bold text-slate-900 truncate">
                         {user.email?.split("@")[0] || "Farmer"}
@@ -218,7 +213,7 @@ export function Sidebar() {
                     </div>
                   )}
                 </div>
-                {!isCollapsed && <ChevronUp size={16} className="text-slate-400 shrink-0" />}
+                {(!isCollapsed || mobileOpen) && <ChevronUp size={16} className="text-slate-400 shrink-0" />}
               </button>
 
               <ProfilePopover
@@ -231,12 +226,11 @@ export function Sidebar() {
           ) : (
             <Link
               href="/auth/login"
-              className={`flex items-center gap-2 rounded-xl bg-crop text-white font-bold text-xs py-2 px-3 shadow-md hover:bg-crop/90 active:scale-95 transition-all cursor-pointer ${
-                isCollapsed ? "justify-center" : "justify-center"
-              }`}
+              onClick={handleNavClick}
+              className="flex items-center justify-center gap-2 rounded-xl bg-crop text-white font-bold text-xs py-2.5 px-3 shadow-md hover:bg-crop/90 active:scale-95 transition-all cursor-pointer w-full"
             >
               <LogIn size={15} />
-              {!isCollapsed && <span>{t("common.signIn")}</span>}
+              {(!isCollapsed || mobileOpen) && <span>{t("common.signIn")}</span>}
             </Link>
           )}
         </div>

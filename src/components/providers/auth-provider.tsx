@@ -3,6 +3,9 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { Capacitor } from "@capacitor/core";
+import { App } from "@capacitor/app";
+import { Browser } from "@capacitor/browser";
 
 interface AuthContextType {
   user: User | null;
@@ -37,17 +40,69 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    // Deep Link & OAuth Listener for Android Native App
+    let appUrlListener: any = null;
+    if (Capacitor.isNativePlatform()) {
+      appUrlListener = App.addListener("appUrlOpen", async (event) => {
+        const url = event.url;
+        if (url && (url.includes("auth/callback") || url.includes("access_token=") || url.includes("code="))) {
+          try {
+            await Browser.close();
+          } catch (e) {}
+
+          if (url.includes("code=")) {
+            try {
+              const parsedUrl = new URL(url);
+              const code = parsedUrl.searchParams.get("code");
+              if (code) {
+                await supabase.auth.exchangeCodeForSession(code);
+              }
+            } catch (err) {
+              console.error("Failed to parse auth code from deep link:", err);
+            }
+          } else if (url.includes("#access_token=")) {
+            try {
+              const hashParams = new URLSearchParams(url.split("#")[1]);
+              const accessToken = hashParams.get("access_token");
+              const refreshToken = hashParams.get("refresh_token");
+              if (accessToken && refreshToken) {
+                await supabase.auth.setSession({
+                  access_token: accessToken,
+                  refresh_token: refreshToken
+                });
+              }
+            } catch (err) {
+              console.error("Failed to parse tokens from deep link:", err);
+            }
+          }
+        }
+      });
+    }
+
+    return () => {
+      subscription.unsubscribe();
+      if (appUrlListener) {
+        appUrlListener.remove();
+      }
+    };
   }, [supabase]);
 
   const signInWithGoogle = async () => {
-    const origin = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+    const isNative = Capacitor.isNativePlatform();
+    const redirectTo = "https://agri-risk1.vercel.app/auth/callback";
+
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${origin}/auth/callback`
+        redirectTo,
+        skipBrowserRedirect: isNative
       }
     });
+
+    if (isNative && data?.url) {
+      await Browser.open({ url: data.url });
+    }
+
     return { error };
   };
 
@@ -60,12 +115,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUpWithEmail = async (email: string, pass: string) => {
-    const origin = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+    const isNative = Capacitor.isNativePlatform();
+    const emailRedirectTo = isNative
+      ? "com.agririsk.app://auth/callback"
+      : typeof window !== "undefined"
+      ? `${window.location.origin}/auth/callback`
+      : "https://agri-risk1.vercel.app/auth/callback";
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password: pass,
       options: {
-        emailRedirectTo: `${origin}/auth/callback`
+        emailRedirectTo
       }
     });
     return { error };
@@ -98,15 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    return {
-      user: null,
-      session: null,
-      loading: false,
-      signInWithGoogle: async () => ({ error: null }),
-      signInWithEmail: async () => ({ error: null }),
-      signUpWithEmail: async () => ({ error: null }),
-      signOut: async () => ({ error: null })
-    };
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

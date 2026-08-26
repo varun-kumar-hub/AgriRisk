@@ -63,16 +63,16 @@ export default function DashboardPage() {
   const healthLabel = healthScore > 75 ? "LOW" : healthScore > 50 ? "MODERATE" : "HIGH";
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-      <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mx-auto max-w-7xl px-3.5 py-4 sm:px-6 lg:px-8 sm:py-6">
+      <header className="flex flex-col gap-2.5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-medium text-crop">{t("dashboard.kharifLocation", { location: `${inputs.distName}, ${inputs.stateName}` })}</p>
-          <h1 className="mt-1 text-3xl font-bold text-slate-950">{t("dashboard.greeting", { name: "Varun" })}</h1>
-          <p className="mt-1 text-slate-600">{t("dashboard.overviewFor", { farm: inputs.farmName })}</p>
+          <p className="text-xs sm:text-sm font-semibold text-crop">{t("dashboard.kharifLocation", { location: `${inputs.distName}, ${inputs.stateName}` })}</p>
+          <h1 className="mt-0.5 text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">{t("dashboard.greeting", { name: "Varun" })}</h1>
+          <p className="mt-1 text-xs sm:text-sm text-slate-600 font-medium">{t("dashboard.overviewFor", { farm: inputs.farmName })}</p>
         </div>
-        <div className="flex items-center gap-2 text-xs font-bold text-crop bg-crop/10 px-3 py-1.5 rounded-full">
-          <Sparkles size={14} className="animate-spin" />
-          {t("dashboard.predictionUpdatedLive")} (Gemini 2.5 Flash)
+        <div className="self-start sm:self-auto flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-crop bg-crop/10 px-3 py-1.5 rounded-full border border-crop/20">
+          <Sparkles size={13} className="animate-spin shrink-0" />
+          <span>{t("dashboard.predictionUpdatedLive")} (Gemini 2.5 Flash)</span>
         </div>
       </header>
 

@@ -18,19 +18,29 @@ export function MobileNav() {
   ];
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-slate-200/80 bg-white/95 px-1 py-1.5 backdrop-blur-md lg:hidden shadow-lg">
+    <nav className="fixed inset-x-0 bottom-0 z-40 flex h-16 items-center justify-around border-t border-slate-200 bg-white/95 px-1 py-1 backdrop-blur-lg lg:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
       {items.map((item) => {
         const isActive = pathname === item.href;
         return (
           <Link
             key={item.href}
             href={item.href}
-            className={`flex flex-col items-center justify-center gap-0.5 rounded-xl py-1 text-[10px] font-bold transition-all cursor-pointer ${
-              isActive ? "text-crop font-extrabold" : "text-slate-500 hover:text-slate-900"
+            className={`flex flex-1 flex-col items-center justify-center py-1 px-0.5 rounded-xl transition-all active:scale-95 cursor-pointer ${
+              isActive
+                ? "text-crop font-extrabold"
+                : "text-slate-500 hover:text-slate-900"
             }`}
           >
-            <item.icon size={19} className={isActive ? "text-crop scale-110 transition-transform" : "text-slate-400"} />
-            <span className="truncate max-w-full">{item.label}</span>
+            <div className={`grid size-8 place-items-center rounded-xl transition-all ${
+              isActive ? "bg-crop/15 text-crop scale-105 shadow-sm" : "bg-transparent text-slate-400"
+            }`}>
+              <item.icon size={20} className={isActive ? "text-crop stroke-[2.5]" : "text-slate-500"} />
+            </div>
+            <span className={`mt-0.5 text-[10px] leading-tight tracking-tight font-extrabold max-w-[68px] truncate text-center ${
+              isActive ? "text-crop font-extrabold" : "text-slate-600"
+            }`}>
+              {item.label}
+            </span>
           </Link>
         );
       })}
