@@ -125,12 +125,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGoogle = async () => {
     const isNative = Capacitor.isNativePlatform();
     
-    // On native Android, use custom app scheme com.agririsk.app://auth/callback so Chrome Custom Tab automatically closes and hands back control to the app
-    const redirectTo = isNative
-      ? "com.agririsk.app://auth/callback"
-      : typeof window !== "undefined"
-      ? `${window.location.origin}/auth/callback`
-      : "https://agri-risk1.vercel.app/auth/callback";
+    // Always use live Vercel HTTPS callback URL so Supabase Auth never falls back to http://localhost:3000 on physical phones
+    const redirectTo = "https://agri-risk1.vercel.app/auth/callback";
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -157,12 +153,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUpWithEmail = async (email: string, pass: string) => {
-    const isNative = Capacitor.isNativePlatform();
-    const emailRedirectTo = isNative
-      ? "com.agririsk.app://auth/callback"
-      : typeof window !== "undefined"
-      ? `${window.location.origin}/auth/callback`
-      : "https://agri-risk1.vercel.app/auth/callback";
+    const emailRedirectTo = "https://agri-risk1.vercel.app/auth/callback";
 
     const { data, error } = await supabase.auth.signUp({
       email,
