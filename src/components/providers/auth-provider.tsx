@@ -26,6 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Initial session restoration on startup (Cold Start / App Launch)
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -40,39 +41,62 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    // Deep Link & OAuth Listener for Android Native App
+    // Android Native Deep Link & OAuth Callback Handler
     let appUrlListener: any = null;
     if (Capacitor.isNativePlatform()) {
       appUrlListener = App.addListener("appUrlOpen", async (event) => {
         const url = event.url;
-        if (url && (url.includes("auth/callback") || url.includes("access_token=") || url.includes("code="))) {
+        if (!url) return;
+
+        // Check if URL matches AgriRisk Auth Callback (Scheme or Web URL)
+        if (
+          url.includes("auth/callback") ||
+          url.includes("access_token=") ||
+          url.includes("code=") ||
+          url.startsWith("com.agririsk.app://")
+        ) {
+          // Close Chrome / Custom Tab if open
           try {
             await Browser.close();
           } catch (e) {}
 
-          if (url.includes("code=")) {
+          // Handle Implicit Flow (#access_token=... & refresh_token=...)
+          if (url.includes("access_token=")) {
             try {
-              const parsedUrl = new URL(url);
-              const code = parsedUrl.searchParams.get("code");
-              if (code) {
-                await supabase.auth.exchangeCodeForSession(code);
-              }
-            } catch (err) {
-              console.error("Failed to parse auth code from deep link:", err);
-            }
-          } else if (url.includes("#access_token=")) {
-            try {
-              const hashParams = new URLSearchParams(url.split("#")[1]);
-              const accessToken = hashParams.get("access_token");
-              const refreshToken = hashParams.get("refresh_token");
+              const hashPart = url.includes("#") ? url.split("#")[1] : url.split("?")[1];
+              const params = new URLSearchParams(hashPart);
+              const accessToken = params.get("access_token");
+              const refreshToken = params.get("refresh_token");
+
               if (accessToken && refreshToken) {
-                await supabase.auth.setSession({
+                const { data, error } = await supabase.auth.setSession({
                   access_token: accessToken,
                   refresh_token: refreshToken
                 });
+                if (!error && data?.session) {
+                  setSession(data.session);
+                  setUser(data.session.user);
+                }
               }
             } catch (err) {
-              console.error("Failed to parse tokens from deep link:", err);
+              console.error("Android Deep Link: Error parsing access_token:", err);
+            }
+          }
+          // Handle PKCE Flow (?code=...)
+          else if (url.includes("code=")) {
+            try {
+              const queryPart = url.includes("?") ? url.split("?")[1] : "";
+              const params = new URLSearchParams(queryPart);
+              const code = params.get("code");
+              if (code) {
+                const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+                if (!error && data?.session) {
+                  setSession(data.session);
+                  setUser(data.session.user);
+                }
+              }
+            } catch (err) {
+              console.error("Android Deep Link: Error exchanging code for session:", err);
             }
           }
         }
@@ -89,7 +113,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     const isNative = Capacitor.isNativePlatform();
-    const redirectTo = "https://agri-risk1.vercel.app/auth/callback";
+    
+    // Use com.agririsk.app://auth/callback on Android Native, or window.location.origin on Web
+    const redirectTo = isNative
+      ? "com.agririsk.app://auth/callback"
+      : typeof window !== "undefined"
+      ? `${window.location.origin}/auth/callback`
+      : "https://agri-risk1.vercel.app/auth/callback";
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -100,6 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (isNative && data?.url) {
+      // Open external Chrome Custom Tab for Google authentication
       await Browser.open({ url: data.url });
     }
 
