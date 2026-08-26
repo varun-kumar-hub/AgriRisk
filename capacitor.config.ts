@@ -6,7 +6,11 @@ const config: CapacitorConfig = {
   webDir: 'out',
   server: {
     url: 'https://agri-risk1.vercel.app',
-    cleartext: true
+    cleartext: true,
+    allowNavigation: [
+      'agri-risk1.vercel.app',
+      '*.vercel.app'
+    ]
   },
   plugins: {
     SplashScreen: {

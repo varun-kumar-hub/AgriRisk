@@ -84,7 +84,7 @@ export default function RiskIntelligencePage() {
               <RiskBadge level={prePlantingRiskLevel} />
             </MetricCard>
             <MetricCard title={t("risk.marketVolatility")} value={getRiskLevelLabel(marketRisk > 60 ? "HIGH" : "MODERATE")} detail={t("risk.marketUncertainty")} />
-            <MetricCard title={t("risk.yieldSuitabilityFit")} value={`${100 - yieldRisk}%`} detail={`Soil pH ${inputs.soilPh} | NPK ${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}`} />
+            <MetricCard title={t("risk.yieldSuitabilityFit")} value={`${100 - yieldRisk}%`} detail={`Soil pH ${inputs.soilPh} | Crop Age ${inputs.cropAge || 45} Days`} />
           </section>
 
           <Card className="border-2 border-crop/30 bg-white shadow-lg">
@@ -110,7 +110,7 @@ export default function RiskIntelligencePage() {
                   <span className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1.5"><Sprout size={15} className="text-emerald-500" /> {t("risk.soilRisk")}</span>
                   <span className="font-extrabold text-sm text-slate-900">{soilRisk}/100</span>
                 </div>
-                <p className="mt-2 text-xs text-slate-600">Soil pH: {inputs.soilPh} | NPK: {inputs.nitrogen}-{inputs.phosphorus}-{inputs.potassium}</p>
+                <p className="mt-2 text-xs text-slate-600">Soil pH: {inputs.soilPh} | Crop Age: {inputs.cropAge || 45} Days</p>
               </div>
 
               <div className="rounded-xl bg-slate-50 p-4 border border-slate-200">

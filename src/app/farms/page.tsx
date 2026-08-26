@@ -35,7 +35,7 @@ export default function FarmsPage() {
           <dl className="mt-5 space-y-3 text-sm">
             <div className="flex justify-between"><dt className="text-slate-500">{t("common.area")}</dt><dd>{farm.areaAcres} {t("farms.acres")}</dd></div>
             <div className="flex justify-between"><dt className="text-slate-500">{t("common.soil")}</dt><dd>{getSoilTypeLabel(farm.soilType)} (pH {farm.soilPh})</dd></div>
-            <div className="flex justify-between"><dt className="text-slate-500">{t("common.soil")} N-P-K</dt><dd>{inputs.nitrogen}-{inputs.phosphorus}-{inputs.potassium} kg/ha</dd></div>
+            <div className="flex justify-between"><dt className="text-slate-500">Crop Age</dt><dd>{inputs.cropAge || 45} days</dd></div>
             <div className="flex justify-between"><dt className="text-slate-500">{t("common.irrigation")}</dt><dd>{getIrrigationLabel(farm.irrigationType)}</dd></div>
             <div className="flex justify-between"><dt className="text-slate-500">{t("customInput.waterAvailability")}</dt><dd>{getRiskLevelLabel(farm.waterAvailability)}</dd></div>
           </dl>

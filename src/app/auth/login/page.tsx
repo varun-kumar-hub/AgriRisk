@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Lock, Mail, Shield, Sprout, ArrowRight } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
@@ -67,6 +68,11 @@ export default function LoginPage() {
           </span>
           <h1 className="mt-3 text-2xl font-extrabold text-slate-950">AgriRisk Platform</h1>
           <p className="mt-1 text-xs text-slate-500">AI-Powered Agricultural Risk & Decision Intelligence</p>
+          <div className="mt-2">
+            <Link href="/" className="text-xs font-bold text-crop hover:underline inline-flex items-center gap-1">
+              ← Back to Project Overview
+            </Link>
+          </div>
         </div>
 
         {/* If user is already logged in */}

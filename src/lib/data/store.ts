@@ -1,5 +1,5 @@
 import { getCropBenchmarkStats } from "./historical-dataset";
-import type { Farm, CropRecommendation, CropRisk, CropCycle, CropHealth, Recommendation, Alert, RiskLevel } from "@/types/domain";
+import type { Farm, CropRecommendation, CropRisk, CropCycle, CropHealth, Recommendation, Alert, RiskLevel, CropStage } from "@/types/domain";
 
 export interface CustomUserInputs {
   farmName: string;
@@ -9,9 +9,7 @@ export interface CustomUserInputs {
   areaAcres: number;
   soilType: string;
   soilPh: number;
-  nitrogen: number;
-  phosphorus: number;
-  potassium: number;
+  cropAge: number; // Crop Age in Days (e.g. 45 Days)
   waterAvailability: "Low" | "Moderate" | "High";
   irrigationType: string;
   temperatureC: number;
@@ -21,20 +19,18 @@ export interface CustomUserInputs {
 }
 
 export const defaultUserInputs: CustomUserInputs = {
-  farmName: "My Custom Farm",
+  farmName: "cvarunkumar455's Farm",
   location: "Durg, Chhattisgarh",
   stateName: "Chhattisgarh",
   distName: "Durg",
   areaAcres: 5,
   soilType: "Clay loam",
   soilPh: 6.5,
-  nitrogen: 20,
-  phosphorus: 10,
-  potassium: 15,
+  cropAge: 45,
   waterAvailability: "Moderate",
   irrigationType: "Canal irrigation",
   temperatureC: 25,
-  rainfallMm: 1000,
+  rainfallMm: 650,
   selectedCrop: "rice",
   sowingDate: "2026-06-15"
 };
@@ -60,7 +56,6 @@ export function getAgronomicConstraintReason(cropKey: string, inputs: CustomUser
 
   const targetTemp = stats?.avgTempC || 25;
   const targetPh = stats?.avgPh || 6.5;
-  const targetN = stats?.avgNReq || 25;
   const cropName = stats?.crop || cropKey;
 
   // Temperature constraint
@@ -118,42 +113,28 @@ export function getAgronomicConstraintReason(cropKey: string, inputs: CustomUser
   }
 
   // Water & Rainfall constraint
-  if (cropKey === "rice" || cropKey === "sugarcane" || cropKey === "banana" || cropKey === "jute") {
-    if (inputs.waterAvailability === "Low" || inputs.rainfallMm < 700) {
-      if (language === "ta") {
-        reasons.push(`நீர் பற்றாக்குறை: ${cropName} பயிருக்கு அதிக நீர் தேவை, ஆனால் உங்கள் வயலில் நீர் அளவு குறைவாக உள்ளது (${inputs.rainfallMm}மிமீ மழை).`);
-      } else if (language === "te") {
-        reasons.push(`నీటి కొరత: ${cropName} పంటకు అధిక నీరు అవసరం, కానీ మీ పొలంలో నీటి లభ్యత తక్కువగా ఉంది (${inputs.rainfallMm}మి.మీ వర్షపాతం).`);
-      } else if (language === "hi") {
-        reasons.push(`जल की कमी: ${cropName} फसल को अधिक पानी की आवश्यकता है, लेकिन आपके खेत में नमी कम है (${inputs.rainfallMm}मीमी बारिश)।`);
-      } else {
-        reasons.push(`Moisture Deficit: ${cropName} requires high water supply (>800mm rain or canal irrigation), but field moisture is Low (${inputs.rainfallMm}mm rain).`);
-      }
-    }
-  } else if (cropKey === "chickpea" || cropKey === "pearl_millet" || cropKey === "mustard" || cropKey === "sesame") {
-    if (inputs.rainfallMm > 1000 || inputs.waterAvailability === "High") {
-      if (language === "ta") {
-        reasons.push(`தேங்கு நீர் ஆபத்து: அதிக மழையினால் (${inputs.rainfallMm}மிமீ) வேர் அழுகல் நோய் ஏற்பட வாய்ப்புள்ளது.`);
-      } else if (language === "te") {
-        reasons.push(`నీరు నిలిచే ముప్పు: అధిక వర్షపాతం (${inputs.rainfallMm}మి.మీ) వల్ల వేరు కుళ్ళు తెగులు వచ్చే అవకాశం ఉంది.`);
-      } else if (language === "hi") {
-        reasons.push(`जलजमाव का जोखिम: अत्यधिक वर्षा (${inputs.rainfallMm}मीमी) से जड़ सड़न रोग होने का खतरा है।`);
-      } else {
-        reasons.push(`Waterlogging / Rot Risk: ${cropName} suffers root rot & wilt under excessive rainfall (${inputs.rainfallMm}mm rain).`);
-      }
+  if (inputs.rainfallMm > 1100 && (cropKey === "chickpea" || cropKey === "mustard" || cropKey === "pearl_millet")) {
+    if (language === "ta") {
+      reasons.push(`அதிக மழை பாதிப்பு: அதிக மழைப்பொழிவு (${inputs.rainfallMm}மிமீ) வேர் அழுகல் நோயை உண்டாக்கும்.`);
+    } else if (language === "te") {
+      reasons.push(`నీటి నిల్వ ప్రమాదం: అధిక వర్షపాతం (${inputs.rainfallMm}మిమీ) వల్ల వేరు కుళ్ళు తెగులు వచ్చే అవకాశం ఉంది.`);
+    } else if (language === "hi") {
+      reasons.push(`जलजमाव का जोखिम: अत्यधिक वर्षा (${inputs.rainfallMm}मीमी) से जड़ सड़न रोग होने का खतरा है।`);
+    } else {
+      reasons.push(`Waterlogging / Rot Risk: ${cropName} suffers root rot & wilt under excessive rainfall (${inputs.rainfallMm}mm rain).`);
     }
   }
 
-  // Nitrogen deficit
-  if (inputs.nitrogen < targetN * 0.6) {
-    if (language === "ta") {
-      reasons.push(`நைட்ரஜன் பற்றாக்குறை: மண்ணில் நைட்ரஜன் அளவு (${inputs.nitrogen} கிலோ/ஏக்கர்) குறைவாக உள்ளது.`);
-    } else if (language === "te") {
-      reasons.push(`నత్రజని కొరత: నేలలో నత్రజని లభ్యత (${inputs.nitrogen} కిలోలు/ఎకరా) తక్కువగా ఉంది.`);
+  // Crop Age Stage Check
+  if (inputs.cropAge > 100) {
+    if (language === "te") {
+      reasons.push(`ముదిరిన పంట దశ: పంట వయస్సు ${inputs.cropAge} రోజులు (కోత / పాలు పోసుకునే దశకు దగ్గరగా ఉంది).`);
+    } else if (language === "ta") {
+      reasons.push(`முதிர்ந்த பயிர் நிலை: பயிர் வயது ${inputs.cropAge} நாட்கள் (அறுவடைக்கு அருகில் உள்ளது).`);
     } else if (language === "hi") {
-      reasons.push(`नाइट्रोजन की कमी: मिट्टी में नाइट्रोजन की मात्रा (${inputs.nitrogen} किग्रा/एकड़) कम है।`);
+      reasons.push(`परिपक्व फसल अवस्था: फसल की उम्र ${inputs.cropAge} दिन है।`);
     } else {
-      reasons.push(`Nitrogen Deficit: Soil N is ${inputs.nitrogen} kg/ha (Target demand for ${cropName} is ${targetN} kg/ha). Stunts leaf canopy growth.`);
+      reasons.push(`Late Growth Stage: Crop age is ${inputs.cropAge} Days (Nearing grain filling or harvest maturity).`);
     }
   }
 
@@ -173,22 +154,16 @@ export function calculateDynamicCropRecommendations(inputs: CustomUserInputs, la
 
     const displayName = stats ? stats.crop : cropKey;
     const avgYield = stats ? stats.avgYieldKgPerHa / 1000 : 3.5;
-    const targetN = stats ? stats.avgNReq : 25;
-    const targetP = stats ? stats.avgPReq : 15;
-    const targetK = stats ? stats.avgKReq : 15;
     const targetPh = stats ? stats.avgPh : 6.5;
     const targetTemp = stats ? stats.avgTempC : 25;
-    const targetRain = stats ? stats.avgRainfallMm : 800;
 
     // 1. Soil pH Suitability
     const phDiff = Math.abs(inputs.soilPh - targetPh);
     const soilPhScore = Math.max(10, Math.min(100, Math.round(100 - phDiff * 32)));
 
-    // 2. N-P-K Nutrients Fit
-    const nScore = Math.min(100, Math.round((inputs.nitrogen / Math.max(1, targetN)) * 100));
-    const pScore = Math.min(100, Math.round((inputs.phosphorus / Math.max(1, targetP)) * 100));
-    const kScore = Math.min(100, Math.round((inputs.potassium / Math.max(1, targetK)) * 100));
-    const npkScore = Math.round((nScore * 0.45) + (pScore * 0.25) + (kScore * 0.30));
+    // 2. Crop Age & Stage Score
+    const ageDays = inputs.cropAge || 45;
+    const ageScore = ageDays >= 30 && ageDays <= 90 ? 95 : ageDays < 30 ? 80 : 70;
 
     // Soil Type Affinity
     let soilTypeBonus = 0;
@@ -198,7 +173,7 @@ export function calculateDynamicCropRecommendations(inputs: CustomUserInputs, la
     if (cropKey === "potato" && inputs.soilType.includes("loam")) soilTypeBonus = 15;
     if (cropKey === "tomato" && inputs.soilType.includes("loam")) soilTypeBonus = 12;
 
-    const soilScore = Math.min(100, Math.max(10, Math.round((soilPhScore * 0.5) + (npkScore * 0.5) + soilTypeBonus)));
+    const soilScore = Math.min(100, Math.max(10, Math.round((soilPhScore * 0.6) + (ageScore * 0.4) + soilTypeBonus)));
 
     // 3. Water & Rainfall Requirements
     let waterScore = 70;
@@ -250,11 +225,11 @@ export function calculateDynamicCropRecommendations(inputs: CustomUserInputs, la
 
     const constraintReasons = getAgronomicConstraintReason(cropKey, inputs, language);
 
-    let explanation = `${displayName} scored ${decisionScore}/100 based on soil pH ${inputs.soilPh}, N-P-K ${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}, and weather in ${inputs.distName}.`;
-    if (language === "ta") explanation = `${displayName} பயிர் உங்கள் மண்ணின் pH ${inputs.soilPh}, N-P-K (${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}) மற்றும் ${inputs.distName} வானிலைக்கு ஏற்ப ${decisionScore}/100 மதிப்பெண் பெற்றது.`;
-    else if (language === "te") explanation = `${displayName} పంట మీ నేల pH ${inputs.soilPh}, N-P-K (${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}) మరియు ${inputs.distName} వాతావరణానికి అనుగుణంగా ${decisionScore}/100 స్కోరు సాధించింది.`;
-    else if (language === "kn") explanation = `${displayName} ಬೆಳೆ ನಿಮ್ಮ ಮಣ್ಣಿನ pH ${inputs.soilPh} ಮತ್ತು ${inputs.distName} ಹವಾಮಾನಕ್ಕೆ ಅನುಗುಣವಾಗಿ ${decisionScore}/100 ಅಂಕ ಪಡೆದಿದೆ.`;
-    else if (language === "hi") explanation = `${displayName} फसल आपकी मिट्टी pH ${inputs.soilPh}, N-P-K (${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}) और ${inputs.distName} के मौसम के अनुसार ${decisionScore}/100 स्कोर करती है।`;
+    let explanation = `${displayName} scored ${decisionScore}/100 based on soil pH ${inputs.soilPh}, Crop Age ${inputs.cropAge} Days, and weather in ${inputs.distName}.`;
+    if (language === "ta") explanation = `${displayName} பயிர் உங்கள் மண்ணின் pH ${inputs.soilPh}, பயிர் வயது ${inputs.cropAge} நாட்கள் மற்றும் ${inputs.distName} வானிலைக்கு ஏற்ப ${decisionScore}/100 மதிப்பெண் பெற்றது.`;
+    else if (language === "te") explanation = `${displayName} పంట మీ నేల pH ${inputs.soilPh}, పంట వయస్సు ${inputs.cropAge} రోజులు మరియు ${inputs.distName} వాతావరణానికి అనుగుణంగా ${decisionScore}/100 స్కోరు సాధించింది.`;
+    else if (language === "kn") explanation = `${displayName} ಬೆಳೆ ನಿಮ್ಮ ಮಣ್ಣಿನ pH ${inputs.soilPh}, ಬೆಳೆಯ ವಯಸ್ಸು ${inputs.cropAge} ದಿನಗಳು ಮತ್ತು ${inputs.distName} ಹವಾಮಾನಕ್ಕೆ ಅನುಗುಣವಾಗಿ ${decisionScore}/100 ಅಂಕ ಪಡೆದಿದೆ.`;
+    else if (language === "hi") explanation = `${displayName} फसल आपकी मिट्टी pH ${inputs.soilPh}, फसल की उम्र ${inputs.cropAge} दिन और ${inputs.distName} के मौसम के अनुसार ${decisionScore}/100 स्कोर करती है।`;
 
     return {
       crop: displayName,
@@ -307,9 +282,7 @@ export function getDynamicFarm(inputs: CustomUserInputs): Farm {
     longitude: 81.28,
     soilType: inputs.soilType,
     soilPh: inputs.soilPh,
-    nitrogen: inputs.nitrogen,
-    phosphorus: inputs.phosphorus,
-    potassium: inputs.potassium,
+    cropAge: inputs.cropAge,
     organicMatter: "Good",
     moisture: inputs.waterAvailability,
     salinity: "Low",
@@ -320,14 +293,22 @@ export function getDynamicFarm(inputs: CustomUserInputs): Farm {
 
 export function getDynamicCropCycle(inputs: CustomUserInputs): CropCycle {
   const cropName = inputs.selectedCrop.charAt(0).toUpperCase() + inputs.selectedCrop.slice(1);
+  const ageDays = inputs.cropAge || 45;
+
+  let stage: CropStage = "Vegetative";
+  if (ageDays < 25) stage = "Germination";
+  else if (ageDays < 50) stage = "Vegetative";
+  else if (ageDays < 80) stage = "Flowering";
+  else stage = "Grain Filling";
+
   return {
     id: "cycle-custom-1",
     farmId: "custom-farm-1",
     crop: cropName,
     season: "Kharif 2026",
     sowingDate: inputs.sowingDate,
-    stage: "Vegetative",
-    ageDays: 42
+    stage,
+    ageDays
   };
 }
 

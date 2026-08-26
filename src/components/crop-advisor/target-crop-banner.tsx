@@ -22,14 +22,14 @@ export function TargetCropStatusBanner() {
     if (language === "ta") {
       if (key === "activeTarget") return "தேர்ந்தெடுக்கப்பட்ட பயிர்:";
       if (key === "suitability") return "பொருத்தம்:";
-      if (key === "recommended") return `✅ ${getCropName(targetRec.crop)} பயிர் உங்கள் மண்ணின் pH (${inputs.soilPh}), N-P-K (${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}) மற்றும் ${inputs.distName} தட்பவெப்பநிலைக்கு உகந்தது.`;
+      if (key === "recommended") return `✅ ${getCropName(targetRec.crop)} பயிர் உங்கள் மண்ணின் pH (${inputs.soilPh}), பயிர் வயது (${inputs.cropAge || 45} நாட்கள்) மற்றும் ${inputs.distName} தட்பவெப்பநிலைக்கு உகந்தது.`;
       if (key === "notRecommended") return `⚠️ ${getCropName(targetRec.crop)} பயிர் உங்கள் தற்போதைய நிலவரத்திற்கு உகந்தது அல்ல. வேளாண் காரணங்கள்:`;
       if (key === "alternative") return "சிறந்த மாற்று பயிர்";
       if (key === "switch") return `மாற்று பயிருக்கு மாறவும்`;
     } else if (language === "te") {
       if (key === "activeTarget") return "ఎంచుకున్న పంట:";
       if (key === "suitability") return "అనుకూలత:";
-      if (key === "recommended") return `✅ ${getCropName(targetRec.crop)} పంట మీ నేల pH (${inputs.soilPh}), N-P-K (${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}) మరియు ${inputs.distName} వాతావరణానికి బాగా అనుకూలం.`;
+      if (key === "recommended") return `✅ ${getCropName(targetRec.crop)} పంట మీ నేల pH (${inputs.soilPh}), పంట వయస్సు (${inputs.cropAge || 45} రోజులు) మరియు ${inputs.distName} వాతావరణానికి బాగా అనుకూలం.`;
       if (key === "notRecommended") return `⚠️ ${getCropName(targetRec.crop)} పంట మీ ప్రస్తుత వివరాలకు అనుకూలమైనది కాదు. వ్యవసాయ ప్రతిబంధకాలు:`;
       if (key === "alternative") return "ఉత్తమ ప్రత్యామ్నాయ పంట";
       if (key === "switch") return `మార్చండి`;
@@ -50,7 +50,7 @@ export function TargetCropStatusBanner() {
     }
     if (key === "activeTarget") return "Active Target Crop:";
     if (key === "suitability") return "Suitability Fit:";
-    if (key === "recommended") return `✅ ${getCropName(targetRec.crop)} is well suited for your soil pH (${inputs.soilPh}), N-P-K (${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}), temperature (${inputs.temperatureC}°C), and water supply in ${inputs.distName}, ${inputs.stateName}.`;
+    if (key === "recommended") return `✅ ${getCropName(targetRec.crop)} is well suited for your soil pH (${inputs.soilPh}), Crop Age (${inputs.cropAge || 45} Days), temperature (${inputs.temperatureC}°C), and water supply in ${inputs.distName}, ${inputs.stateName}.`;
     if (key === "notRecommended") return `⚠️ ${getCropName(targetRec.crop)} is NOT recommended under your current farm inputs. Detailed agronomic constraints:`;
     if (key === "alternative") return "Better Alternative";
     if (key === "switch") return `Switch to`;

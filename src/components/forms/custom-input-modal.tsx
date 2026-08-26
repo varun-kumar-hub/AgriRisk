@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useUserInput } from "@/components/providers/user-input-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import {
   SOIL_TYPES,
   IRRIGATION_TYPES
 } from "@/lib/data/india-regions";
-import { MapPin, Sparkles, SlidersHorizontal, RefreshCw } from "lucide-react";
+import { SlidersHorizontal, Sparkles } from "lucide-react";
 
 export function CustomInputPanel() {
   const { inputs, updateInputs, resetInputs } = useUserInput();
@@ -27,7 +27,6 @@ export function CustomInputPanel() {
   const stateList = Object.keys(INDIAN_STATES_DISTRICTS);
   const availableDistricts = INDIAN_STATES_DISTRICTS[selectedState] || [];
 
-  // Update district when state changes
   const handleStateSelect = (state: string) => {
     if (state === "OTHER") {
       setIsCustomState(true);
@@ -58,19 +57,18 @@ export function CustomInputPanel() {
     }
   };
 
-  // Quick preset filler for soil types
   const applySoilPreset = (soilType: string) => {
-    let preset = { soilPh: 6.5, nitrogen: 20, phosphorus: 10, potassium: 15 };
+    let preset = { soilPh: 6.5, cropAge: 45 };
     if (soilType.includes("Black")) {
-      preset = { soilPh: 7.8, nitrogen: 30, phosphorus: 18, potassium: 25 };
+      preset = { soilPh: 7.8, cropAge: 60 };
     } else if (soilType.includes("Red")) {
-      preset = { soilPh: 6.2, nitrogen: 22, phosphorus: 12, potassium: 15 };
+      preset = { soilPh: 6.2, cropAge: 30 };
     } else if (soilType.includes("Alluvial")) {
-      preset = { soilPh: 7.0, nitrogen: 40, phosphorus: 25, potassium: 30 };
+      preset = { soilPh: 7.0, cropAge: 50 };
     } else if (soilType.includes("Clay")) {
-      preset = { soilPh: 6.8, nitrogen: 25, phosphorus: 15, potassium: 20 };
+      preset = { soilPh: 6.8, cropAge: 40 };
     } else if (soilType.includes("Laterite")) {
-      preset = { soilPh: 5.5, nitrogen: 15, phosphorus: 8, potassium: 10 };
+      preset = { soilPh: 5.5, cropAge: 25 };
     }
     updateInputs(preset);
   };
@@ -84,7 +82,7 @@ export function CustomInputPanel() {
             {t("customInput.testingProfileActive")}
           </h3>
           <p className="text-sm text-slate-600 mt-1">
-            {t("customInput.testing")}: <strong>{inputs.farmName}</strong> ({inputs.distName}, {inputs.stateName}) · {t("common.crop")}: <strong className="capitalize">{getCropName(inputs.selectedCrop)}</strong> · {t("customInput.soilPh")}: {inputs.soilPh} · NPK: {inputs.nitrogen}-{inputs.phosphorus}-{inputs.potassium}
+            {t("customInput.testing")}: <strong>{inputs.farmName}</strong> ({inputs.distName}, {inputs.stateName}) · {t("common.crop")}: <strong className="capitalize">{getCropName(inputs.selectedCrop)}</strong> · {t("customInput.soilPh")}: {inputs.soilPh} · Crop Age: {inputs.cropAge || 45} Days
           </p>
         </div>
         <Button onClick={() => setIsOpen(true)}>
@@ -201,13 +199,11 @@ export function CustomInputPanel() {
           />
         </div>
 
-        {/* Soil Type Dropdown with Auto-Preset Fill */}
+        {/* Soil Type Dropdown */}
         <div>
-          <div className="flex items-center justify-between">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
-              Soil Classification
-            </label>
-          </div>
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
+            Soil Classification
+          </label>
           <select
             value={inputs.soilType}
             onChange={(e) => {
@@ -259,43 +255,29 @@ export function CustomInputPanel() {
           />
         </div>
 
-        {/* Soil Nitrogen N */}
-        <div>
+        {/* Crop Age in Days */}
+        <div className="sm:col-span-2 lg:col-span-1">
           <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
-            {t("customInput.nitrogen")}
+            Crop Age (Days)
           </label>
-          <input
-            type="number"
-            value={inputs.nitrogen}
-            onChange={(e) => updateInputs({ nitrogen: parseFloat(e.target.value) || 0 })}
-            className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold focus:border-crop focus:outline-none focus:ring-2 focus:ring-crop/20"
-          />
-        </div>
-
-        {/* Soil Phosphorus P */}
-        <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
-            {t("customInput.phosphorus")}
-          </label>
-          <input
-            type="number"
-            value={inputs.phosphorus}
-            onChange={(e) => updateInputs({ phosphorus: parseFloat(e.target.value) || 0 })}
-            className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold focus:border-crop focus:outline-none focus:ring-2 focus:ring-crop/20"
-          />
-        </div>
-
-        {/* Soil Potassium K */}
-        <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
-            {t("customInput.potassium")}
-          </label>
-          <input
-            type="number"
-            value={inputs.potassium}
-            onChange={(e) => updateInputs({ potassium: parseFloat(e.target.value) || 0 })}
-            className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold focus:border-crop focus:outline-none focus:ring-2 focus:ring-crop/20"
-          />
+          <div className="mt-1.5 flex items-center gap-3">
+            <input
+              type="number"
+              min="1"
+              max="180"
+              value={inputs.cropAge || 45}
+              onChange={(e) => updateInputs({ cropAge: parseInt(e.target.value) || 1 })}
+              className="w-24 rounded-xl border border-slate-300 px-3 py-2 text-sm font-bold text-crop focus:border-crop focus:outline-none focus:ring-2 focus:ring-crop/20"
+            />
+            <input
+              type="range"
+              min="1"
+              max="150"
+              value={inputs.cropAge || 45}
+              onChange={(e) => updateInputs({ cropAge: parseInt(e.target.value) || 1 })}
+              className="flex-1 accent-crop cursor-pointer"
+            />
+          </div>
         </div>
 
         {/* Water Availability */}
@@ -399,7 +381,7 @@ export function CustomInputPanel() {
           onClick={() => applySoilPreset(inputs.soilType)}
           className="flex items-center gap-1.5 text-xs font-bold text-crop hover:underline cursor-pointer"
         >
-          <Sparkles size={14} /> Auto-fill Typical N-P-K & pH for {inputs.soilType}
+          <Sparkles size={14} /> Auto-fill Crop Age & pH for {inputs.soilType}
         </button>
 
         <div className="flex gap-3">

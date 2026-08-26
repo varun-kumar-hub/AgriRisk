@@ -33,9 +33,7 @@ export function formatCurrency(value: number) {
 export interface PrePlantingRiskInput {
   crop: string;
   soilPh: number;
-  nitrogen: number;
-  phosphorus: number;
-  potassium: number;
+  cropAge: number;
   rainfallMm: number;
   temperatureC: number;
   waterAvailability: "Low" | "Moderate" | "High";
@@ -43,7 +41,7 @@ export interface PrePlantingRiskInput {
 
 export function calculatePrePlantingRisk(input: PrePlantingRiskInput) {
   const weatherRisk = Math.min(95, Math.max(10, Math.round(Math.abs(input.rainfallMm - 1000) / 15 + Math.abs(input.temperatureC - 25) * 3)));
-  const soilRisk = Math.min(90, Math.max(10, Math.round(Math.abs(input.soilPh - 6.5) * 22 + (input.nitrogen < 15 ? 15 : 0))));
+  const soilRisk = Math.min(90, Math.max(10, Math.round(Math.abs(input.soilPh - 6.5) * 22)));
   const waterRisk = input.waterAvailability === "Low" ? 85 : input.waterAvailability === "Moderate" ? 45 : 18;
   const marketRisk = input.crop === "cotton" ? 78 : input.crop === "rice" ? 35 : 52;
   const yieldRisk = Math.min(92, Math.max(12, Math.round((weatherRisk + soilRisk + waterRisk) / 3)));

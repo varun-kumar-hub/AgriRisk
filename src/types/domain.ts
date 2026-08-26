@@ -27,9 +27,7 @@ export type Farm = {
   longitude: number;
   soilType: string;
   soilPh: number;
-  nitrogen: number;
-  phosphorus: number;
-  potassium: number;
+  cropAge: number;
   organicMatter: string;
   moisture: string;
   salinity: string;
