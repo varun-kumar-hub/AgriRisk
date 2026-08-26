@@ -52,15 +52,15 @@ export default function CopilotPage() {
   const getWelcomeText = (lang: string) => {
     const crop = getCropName(inputs.selectedCrop);
     if (lang === "ta") {
-      return `🌱 **அக்ரிரிலாஜிக் AI உதவியாளருக்கு நல்வரவு!**\n\nநான் உங்கள் **${inputs.distName}, ${inputs.stateName}** பண்ணையுடன் இணைக்கப்பட்டுள்ள AI வேளாண் உதவியாளர்.\n\n• **பயிர்:** ${crop}\n• **மண் pH:** ${inputs.soilPh} (N-P-K: ${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium})\n• **வானிலை:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}மிமீ மழை\n\nஉர அளவு, பூச்சி மேலாண்மை, பாசனம் அல்லது அரசு திட்டங்கள் பற்றி எந்த கேள்வியும் கேட்கலாம்!`;
+      return `🌱 **அக்ரிரிலாஜிக் AI உதவியாளருக்கு நல்வரவு!**\n\nநான் உங்கள் **${inputs.distName}, ${inputs.stateName}** பண்ணையுடன் இணைக்கப்பட்டுள்ள AI வேளாண் உதவியாளர்.\n\n• **பயிர்:** ${crop}\n• **மண் pH:** ${inputs.soilPh} · **பயிர் வயது:** ${inputs.cropAge || 45} நாட்கள்\n• **வானிலை:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}மிமீ மழை\n\nஉர அளவு, பூச்சி மேலாண்மை, பாசனம் அல்லது அரசு திட்டங்கள் பற்றி எந்த கேள்வியும் கேட்கலாம்!`;
     } else if (lang === "te") {
-      return `🌱 **అగ్రిరిస్క్ AI అసిస్టెంట్‌కి స్వాగతం!**\n\nనేను మీ **${inputs.distName}, ${inputs.stateName}** పొలంతో అనుసంధానించబడిన AI వ్యవసాయ సహాయకుడిని.\n\n• **పంట:** ${crop}\n• **నేల pH:** ${inputs.soilPh} (N-P-K: ${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium})\n• **వాతావరణం:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}మి.మీ వర్షపాతం\n\nఎరువుల మోతాదు, పురుగుల నివారణ, నీటి పారుదల లేదా ప్రభుత్వ పథకాల గురించి ఏ ప్రశ్లనైనా అడగండి!`;
+      return `🌱 **అగ్రిరిస్క్ AI అసిస్టెంట్‌కి స్వాగతం!**\n\nనేను మీ **${inputs.distName}, ${inputs.stateName}** పొలంతో అనుసంధానించబడిన AI వ్యవసాయ సహాయకుడిని.\n\n• **పంట:** ${crop}\n• **నేల pH:** ${inputs.soilPh} · **పంట వయస్సు:** ${inputs.cropAge || 45} రోజులు\n• **వాతావరణం:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}మి.మీ వర్షపాతం\n\nఎరువుల మోతాదు, పురుగుల నివారణ, నీటి పారుదల లేదా ప్రభుత్వ పథకాల గురించి ఏ ప్రశ్లనైనా అడగండి!`;
     } else if (lang === "kn") {
-      return `🌱 **ಅಗ್ರಿರಿಸ್ಕ್ AI ಸಹಾಯಕರಾಗಿ ಸುಸ್ವಾಗತ!**\n\nನಾನು ನಿಮ್ಮ **${inputs.distName}, ${inputs.stateName}** ಹೊಲಕ್ಕೆ ಸಂಪರ್ಕಗೊಂಡಿರುವ AI ಕೃಷಿ ಸಹಾಯಕರಾಗಿದ್ದೇನೆ.\n\n• **ಬೆಳೆ:** ${crop}\n• **ಮಣ್ಣಿನ pH:** ${inputs.soilPh}\n• **ಹವಾಮಾನ:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}ಮಿಮೀ ಮಳೆ\n\nಗೊಬ್ಬರದ ಪ್ರಮಾಣ, ಕೀಟ ನಿಯಂತ್ರಣ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ಯಾವುದೇ ಪ್ರಶ್ನೆ ಕೇಳಿ!`;
+      return `🌱 **ಅಗ್ರಿರಿಸ್ಕ್ AI ಸಹಾಯಕರಾಗಿ ಸುಸ್ವಾಗತ!**\n\nನಾನು ನಿಮ್ಮ **${inputs.distName}, ${inputs.stateName}** ಹೊಲಕ್ಕೆ ಸಂಪರ್ಕಗೊಂಡಿರುವ AI ಕೃಷಿ ಸಹಾಯಕರಾಗಿದ್ದೇನೆ.\n\n• **ಬೆಳೆ:** ${crop}\n• **ಮಣ್ಣಿನ pH:** ${inputs.soilPh} · **ಬೆಳೆಯ ವಯಸ್ಸು:** ${inputs.cropAge || 45} ದಿನಗಳು\n• **ಹವಾಮಾನ:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}ಮಿಮೀ ಮಳೆ\n\nಗೊಬ್ಬರದ ಪ್ರಮಾಣ, ಕೀಟ ನಿಯಂತ್ರಣ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ಯಾವುದೇ ಪ್ರಶ್ನೆ ಕೇಳಿ!`;
     } else if (lang === "hi") {
-      return `🌱 **एग्रीरिस्क AI सहायक में आपका स्वागत है!**\n\nमैं **${inputs.distName}, ${inputs.stateName}** के आपके खेत से जुड़ा कृषि AI सहायक हूँ।\n\n• **फसल:** ${crop}\n• **मिट्टी pH:** ${inputs.soilPh} (N-P-K: ${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium})\n• **मौसम:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}मीमी बारिश\n\nउर्वरक मात्रा, कीट नियंत्रण, सिंचाई या सरकारी योजनाओं के बारे में कोई भी प्रश्न पूछें!`;
+      return `🌱 **एग्रीरिस्क AI सहायक में आपका स्वागत है!**\n\nमैं **${inputs.distName}, ${inputs.stateName}** के आपके खेत से जुड़ा कृषि AI सहायक हूँ।\n\n• **फसल:** ${crop}\n• **मिट्टी pH:** ${inputs.soilPh} · **फसल की उम्र:** ${inputs.cropAge || 45} दिन\n• **मौसम:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}मीमी बारिश\n\nउर्वरक मात्रा, कीट नियंत्रण, सिंचाई या सरकारी योजनाओं के बारे में कोई भी प्रश्न पूछें!`;
     }
-    return `🌱 **Welcome to AgriRisk AI Copilot!**\n\nI am your real-time agricultural AI assistant connected to your farm in **${inputs.distName}, ${inputs.stateName}**.\n\n• **Active Target Crop:** ${crop}\n• **Soil Health:** pH ${inputs.soilPh} · N-P-K ${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium} kg/ha\n• **Weather:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}mm rain\n\nAsk me **ANY agricultural question** — from N-P-K fertilizer schedules, pest/disease identification, organic sprays, irrigation, market prices, to PM-KISAN government schemes!`;
+    return `🌱 **Welcome to AgriRisk AI Copilot!**\n\nI am your real-time agricultural AI assistant connected to your farm in **${inputs.distName}, ${inputs.stateName}**.\n\n• **Active Target Crop:** ${crop}\n• **Soil & Crop Status:** pH ${inputs.soilPh} · Crop Age ${inputs.cropAge || 45} Days\n• **Weather:** ${inputs.temperatureC}°C · ${inputs.rainfallMm}mm rain\n\nAsk me **ANY agricultural question** — from fertilizer schedules, pest/disease identification, organic sprays, irrigation, market prices, to PM-KISAN government schemes!`;
   };
 
   const getWelcomeFollowUps = (lang: string) => {
@@ -157,9 +157,7 @@ export default function CopilotPage() {
             selectedCrop: inputs.selectedCrop,
             soilType: inputs.soilType,
             soilPh: inputs.soilPh,
-            nitrogen: inputs.nitrogen,
-            phosphorus: inputs.phosphorus,
-            potassium: inputs.potassium,
+            cropAge: inputs.cropAge || 45,
             temperatureC: inputs.temperatureC,
             rainfallMm: inputs.rainfallMm,
             waterAvailability: inputs.waterAvailability

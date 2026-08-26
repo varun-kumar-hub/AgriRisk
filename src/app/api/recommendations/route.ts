@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
     const fallback = getLocalizedActionRecommendations(inputs, language);
 
     return NextResponse.json({
-      recommendations: aiRecommendations.length > 0 ? aiRecommendations : fallback,
+      recommendations: (aiRecommendations && aiRecommendations.length > 0) ? aiRecommendations : fallback,
       inputs,
       language,
       timestamp: new Date().toISOString()
