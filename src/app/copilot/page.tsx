@@ -312,7 +312,7 @@ export default function CopilotPage() {
               🌱 {getCropName(inputs.selectedCrop)}
             </span>
             <span className="rounded-md bg-slate-100 px-2 py-0.5 font-bold text-slate-800 border">
-              🧪 pH {inputs.soilPh} (N-P-K: {inputs.nitrogen}-{inputs.phosphorus}-{inputs.potassium})
+              🧪 pH {inputs.soilPh} · Crop Age: {inputs.cropAge || 45} Days
             </span>
             <span className="rounded-md bg-slate-100 px-2 py-0.5 font-bold text-slate-800 border">
               🌦 {inputs.temperatureC}°C · {inputs.rainfallMm}mm rain
