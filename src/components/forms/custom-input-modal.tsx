@@ -351,44 +351,44 @@ export function CustomInputPanel() {
             className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold focus:border-crop focus:outline-none focus:ring-2 focus:ring-crop/20 capitalize"
           >
             <optgroup label="🌾 Cereals & Grains">
-              <option value="rice">Rice (Paddy)</option>
-              <option value="wheat">Wheat</option>
-              <option value="maize">Maize (Corn)</option>
-              <option value="sorghum">Sorghum (Jowar)</option>
-              <option value="pearl_millet">Pearl Millet (Bajra)</option>
-              <option value="finger_millet">Finger Millet (Ragi)</option>
+              <option value="rice">{getCropName("rice")}</option>
+              <option value="wheat">{getCropName("wheat")}</option>
+              <option value="maize">{getCropName("maize")}</option>
+              <option value="sorghum">{getCropName("sorghum")}</option>
+              <option value="pearl_millet">{getCropName("pearl_millet")}</option>
+              <option value="finger_millet">{getCropName("finger_millet")}</option>
             </optgroup>
             <optgroup label="🌱 Pulses & Legumes">
-              <option value="chickpea">Chickpea (Gram)</option>
-              <option value="pigeon_pea">Pigeon Pea (Tur/Arhar)</option>
-              <option value="green_gram">Green Gram (Moong)</option>
-              <option value="black_gram">Black Gram (Urad)</option>
+              <option value="chickpea">{getCropName("chickpea")}</option>
+              <option value="pigeon_pea">{getCropName("pigeon_pea")}</option>
+              <option value="green_gram">{getCropName("green_gram")}</option>
+              <option value="black_gram">{getCropName("black_gram")}</option>
             </optgroup>
             <optgroup label="🌻 Oilseeds">
-              <option value="groundnut">Groundnut (Peanut)</option>
-              <option value="mustard">Mustard / Rapeseed</option>
-              <option value="soybean">Soybean</option>
-              <option value="sunflower">Sunflower</option>
-              <option value="sesame">Sesame (Til)</option>
+              <option value="groundnut">{getCropName("groundnut")}</option>
+              <option value="mustard">{getCropName("mustard")}</option>
+              <option value="soybean">{getCropName("soybean")}</option>
+              <option value="sunflower">{getCropName("sunflower")}</option>
+              <option value="sesame">{getCropName("sesame")}</option>
             </optgroup>
             <optgroup label="💵 Cash & Industrial Crops">
-              <option value="cotton">Cotton</option>
-              <option value="sugarcane">Sugarcane</option>
-              <option value="jute">Jute</option>
+              <option value="cotton">{getCropName("cotton")}</option>
+              <option value="sugarcane">{getCropName("sugarcane")}</option>
+              <option value="jute">{getCropName("jute")}</option>
             </optgroup>
             <optgroup label="🍅 Vegetables & Commercial">
-              <option value="tomato">Tomato</option>
-              <option value="potato">Potato</option>
-              <option value="onion">Onion</option>
-              <option value="chilli">Chilli (Red/Green)</option>
-              <option value="brinjal">Brinjal (Eggplant)</option>
-              <option value="okra">Okra (Lady Finger)</option>
-              <option value="garlic">Garlic</option>
+              <option value="tomato">{getCropName("tomato")}</option>
+              <option value="potato">{getCropName("potato")}</option>
+              <option value="onion">{getCropName("onion")}</option>
+              <option value="chilli">{getCropName("chilli")}</option>
+              <option value="brinjal">{getCropName("brinjal")}</option>
+              <option value="okra">{getCropName("okra")}</option>
+              <option value="garlic">{getCropName("garlic")}</option>
             </optgroup>
             <optgroup label="🥭 Fruits & Horticulture">
-              <option value="mango">Mango</option>
-              <option value="banana">Banana</option>
-              <option value="papaya">Papaya</option>
+              <option value="mango">{getCropName("mango")}</option>
+              <option value="banana">{getCropName("banana")}</option>
+              <option value="papaya">{getCropName("papaya")}</option>
             </optgroup>
           </select>
         </div>

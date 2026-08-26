@@ -163,7 +163,7 @@ export default function RiskIntelligencePage() {
               <RiskBadge level={farmRiskLevel} />
             </MetricCard>
             <MetricCard title="Primary Field Threat" value={diseaseRisk > 70 ? "Fungal Leaf Blight" : "Water Stress"} detail="Immediate field monitoring required" />
-            <MetricCard title={t("dashboard.cropHealthIndex")} value="78/100" detail={`${t("common.stage")}: ${activeCropCycle.stage}`} />
+            <MetricCard title={t("dashboard.cropHealthIndex")} value="78/100" detail={`${t("common.stage")}: ${getGrowthStageLabel(activeCropCycle.stage)}`} />
           </section>
 
           <Card className="border-2 border-sky-300 bg-white shadow-lg">
@@ -228,7 +228,7 @@ export default function RiskIntelligencePage() {
             <div className="mt-5 rounded-xl bg-sky-50 p-4 border border-sky-100">
               <p className="font-bold text-sky-950 text-sm">Recommended Field Action:</p>
               <p className="mt-1 text-xs text-sky-800 leading-5">
-                Maintain optimal irrigation monitoring over the next 48 hours to protect tillering during the {activeCropCycle.stage} stage.
+                Maintain optimal irrigation monitoring over the next 48 hours to protect tillering during the {getGrowthStageLabel(activeCropCycle.stage)} stage.
               </p>
             </div>
           </Card>

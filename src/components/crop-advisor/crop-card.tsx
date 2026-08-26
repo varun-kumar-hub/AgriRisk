@@ -44,16 +44,7 @@ export function CropCard({ crop }: { crop: CropRecommendation }) {
       </div>
 
       <p className="mt-4 flex-1 text-xs sm:text-sm leading-5 sm:leading-6 text-slate-600 font-medium">
-        {t("cropAdvisor.cardExplanation", {
-          crop: getCropName(crop.crop),
-          score: crop.decisionScore,
-          ph: inputs.soilPh,
-          nitrogen: inputs.nitrogen,
-          phosphorus: inputs.phosphorus,
-          potassium: inputs.potassium,
-          temp: inputs.temperatureC,
-          rain: inputs.rainfallMm,
-        })}
+        {crop.explanation}
       </p>
 
       <Link

@@ -127,9 +127,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   };
 
   const getCropName = (cropId: string): string => {
+    if (!cropId) return "";
     const lower = cropId.toLowerCase().trim();
     if (CROP_TRANSLATIONS[lower]) {
       return CROP_TRANSLATIONS[lower][language] || CROP_TRANSLATIONS[lower][DEFAULT_LANGUAGE];
+    }
+    const matchedKey = Object.keys(CROP_TRANSLATIONS).find(
+      (k) => lower.includes(k) || k.includes(lower)
+    );
+    if (matchedKey && CROP_TRANSLATIONS[matchedKey]) {
+      return CROP_TRANSLATIONS[matchedKey][language] || CROP_TRANSLATIONS[matchedKey][DEFAULT_LANGUAGE];
     }
     return cropId;
   };

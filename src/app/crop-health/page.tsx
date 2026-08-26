@@ -36,7 +36,7 @@ export default function CropHealthPage() {
         <MetricCard title={t("cropHealth.leafChlorophyll")} value={`${leafChlorophyll} SPAD`} detail={t("cropHealth.soilNitrogen", { n: inputs.nitrogen })}>
           <span className="text-xs font-bold text-crop bg-crop/10 px-2 py-0.5 rounded-md">{t("cropHealth.goodVigour")}</span>
         </MetricCard>
-        <MetricCard title={t("cropHealth.canopyCoverage")} value={`${canopyCoverPct}%`} detail={`${t("common.stage")}: ${activeCropCycle.stage}`}>
+        <MetricCard title={t("cropHealth.canopyCoverage")} value={`${canopyCoverPct}%`} detail={`${t("common.stage")}: ${getGrowthStageLabel(activeCropCycle.stage)}`}>
           <span className="text-xs font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md">{t("cropHealth.activeTillering")}</span>
         </MetricCard>
         <MetricCard title={t("cropHealth.fieldStressLevel")} value={`${cropRisk.overallScore}/100`} detail={`${t("common.temp")}: ${inputs.temperatureC}°C | ${t("common.rain")}: ${inputs.rainfallMm}mm`}>

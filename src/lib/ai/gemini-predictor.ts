@@ -8,7 +8,7 @@ export async function predictCropRecommendationsWithGemini(
   targetLang: SupportedLanguage = "en"
 ): Promise<CropRecommendation[]> {
   const apiKey = process.env.GEMINI_API_KEY;
-  const fallbackRecs = calculateDynamicCropRecommendations(inputs);
+  const fallbackRecs = calculateDynamicCropRecommendations(inputs, targetLang);
 
   if (!apiKey) {
     console.warn("GEMINI_API_KEY is missing. Using fallback dynamic benchmark engine.");

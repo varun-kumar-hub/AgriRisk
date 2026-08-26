@@ -101,9 +101,9 @@ export function UserInputProvider({ children }: { children: React.ReactNode }) {
   };
 
   const farm = useMemo(() => getDynamicFarm(inputs), [inputs]);
-  const fallbackRecommendations = useMemo(() => calculateDynamicCropRecommendations(inputs), [inputs]);
+  const fallbackRecommendations = useMemo(() => calculateDynamicCropRecommendations(inputs, language), [inputs, language]);
   const activeCropCycle = useMemo(() => getDynamicCropCycle(inputs), [inputs]);
-  const cropRisk = useMemo(() => getDynamicCropRisk(inputs), [inputs]);
+  const cropRisk = useMemo(() => getDynamicCropRisk(inputs, language), [inputs, language]);
 
   const mergedRecommendations = useMemo(() => {
     return aiRecommendations.length > 0 ? aiRecommendations : fallbackRecommendations;

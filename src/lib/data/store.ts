@@ -54,58 +54,120 @@ export const ALL_SUPPORTED_CROPS = [
   "mango", "banana", "papaya"
 ];
 
-export function getAgronomicConstraintReason(cropKey: string, inputs: CustomUserInputs): string[] {
+export function getAgronomicConstraintReason(cropKey: string, inputs: CustomUserInputs, language: string = "en"): string[] {
   const stats = getCropBenchmarkStats(cropKey);
   const reasons: string[] = [];
 
   const targetTemp = stats?.avgTempC || 25;
   const targetPh = stats?.avgPh || 6.5;
-  const targetRain = stats?.avgRainfallMm || 800;
   const targetN = stats?.avgNReq || 25;
   const cropName = stats?.crop || cropKey;
 
   // Temperature constraint
   if (Math.abs(inputs.temperatureC - targetTemp) > 4) {
     if (inputs.temperatureC > targetTemp) {
-      reasons.push(`Heat Stress: Field temp is ${inputs.temperatureC}°C (Optimal for ${cropName} is ${targetTemp}°C). High heat accelerates evapotranspiration & causes heat sterility.`);
+      if (language === "ta") {
+        reasons.push(`வெப்ப அழுத்தக் கட்டுப்பாடு: வயல் வெப்பநிலை ${inputs.temperatureC}°C (${cropName} பயிருக்கான உகந்த அளவு ${targetTemp}°C). அதிக வெப்பம் மகசூலைக் குறைக்கும்.`);
+      } else if (language === "te") {
+        reasons.push(`వేడి ఒత్తిడి ప్రతిబంధకం: పొలం ఉష్ణోగ్రత ${inputs.temperatureC}°C (${cropName} కి అనుకూలమైనది ${targetTemp}°C). అధిక వేడి గింజ తయారీని దెబ్బతీస్తుంది.`);
+      } else if (language === "kn") {
+        reasons.push(`ಉಷ್ಣತೆಯ ಒತ್ತಡ: ಹೊಲದ ತಾಪಮಾನ ${inputs.temperatureC}°C (${cropName} ಬೆಳೆಗೆ ಸೂಕ್ತ ತಾಪಮಾನ ${targetTemp}°C). ಹೆಚ್ಚಿನ ತಾಪಮಾನ ಇಳುವರಿಯನ್ನು ಕಡಿಮೆ ಮಾಡುತ್ತದೆ.`);
+      } else if (language === "hi") {
+        reasons.push(`तापमान तनाव: खेत का तापमान ${inputs.temperatureC}°C है (${cropName} के लिए अनुकूल ${targetTemp}°C)। उच्च तापमान पैदावार को प्रभावित करता है।`);
+      } else {
+        reasons.push(`Heat Stress: Field temp is ${inputs.temperatureC}°C (Optimal for ${cropName} is ${targetTemp}°C). High heat accelerates evapotranspiration & causes heat sterility.`);
+      }
     } else {
-      reasons.push(`Cold Stress: Field temp is ${inputs.temperatureC}°C (Optimal for ${cropName} is ${targetTemp}°C). Slows germination & vegetative biomass.`);
+      if (language === "ta") {
+        reasons.push(`குளிர்ந்த காலநிலை கட்டுப்பாடு: வயல் வெப்பநிலை ${inputs.temperatureC}°C (${cropName} பயிருக்கு உகந்த அளவு ${targetTemp}°C).`);
+      } else if (language === "te") {
+        reasons.push(`చలి ఒత్తిడి: పొలం ఉష్ణోగ్రత ${inputs.temperatureC}°C (${cropName} కి అనుకూలమైనది ${targetTemp}°C).`);
+      } else if (language === "hi") {
+        reasons.push(`ठंड का तनाव: खेत का तापमान ${inputs.temperatureC}°C है (${cropName} के लिए अनुकूल ${targetTemp}°C)।`);
+      } else {
+        reasons.push(`Cold Stress: Field temp is ${inputs.temperatureC}°C (Optimal for ${cropName} is ${targetTemp}°C). Slows germination & vegetative biomass.`);
+      }
     }
   }
 
   // Soil pH constraint
   if (Math.abs(inputs.soilPh - targetPh) > 0.8) {
     if (inputs.soilPh > targetPh) {
-      reasons.push(`Alkaline Soil Stress: Soil pH is ${inputs.soilPh} (Optimal is ${targetPh}). High alkalinity inhibits Iron & Zinc micronutrient uptake.`);
+      if (language === "ta") {
+        reasons.push(`கார மண் கட்டுப்பாடு: மண்ணின் pH ${inputs.soilPh} (உகந்த அளவு ${targetPh}). அதிக காரத்தன்மை ஊட்டச்சத்து உறிஞ்சுதலைத் தடுக்கும்.`);
+      } else if (language === "te") {
+        reasons.push(`క్షార నేల ప్రతిబంధకం: నేల pH ${inputs.soilPh} (అనుకూలమైనది ${targetPh}). అధిక క్షారత జింక్ మరియు ఇనుము పోషకాల గ్రహణాన్ని అడ్డుకుంటుంది.`);
+      } else if (language === "kn") {
+        reasons.push(`ಕ್ಷಾರೀಯ ಮಣ್ಣಿನ ಒತ್ತಡ: ಮಣ್ಣಿನ pH ${inputs.soilPh} (ಸೂಕ್ತ ಪ್ರಮಾಣ ${targetPh}). ಹೆಚ್ಚಿನ ಕ್ಷಾರತೆ ಪೋಷಕಾಂಶಗಳ ಲಭ್ಯತೆಯನ್ನು ತಡೆಯುತ್ತದೆ.`);
+      } else if (language === "hi") {
+        reasons.push(`क्षारीय मिट्टी तनाव: मिट्टी का pH ${inputs.soilPh} है (अनुकूल ${targetPh})। उच्च क्षारीयता पोषक तत्वों के अवशोषण को रोकती है।`);
+      } else {
+        reasons.push(`Alkaline Soil Stress: Soil pH is ${inputs.soilPh} (Optimal is ${targetPh}). High alkalinity inhibits Iron & Zinc micronutrient uptake.`);
+      }
     } else {
-      reasons.push(`Acidic Soil Stress: Soil pH is ${inputs.soilPh} (Optimal is ${targetPh}). Causes Phosphorus fixation & aluminum root toxicity.`);
+      if (language === "ta") {
+        reasons.push(`அமில மண் கட்டுப்பாடு: மண்ணின் pH ${inputs.soilPh} (உகந்த அளவு ${targetPh}).`);
+      } else if (language === "te") {
+        reasons.push(`ఆమ్ల నేల ప్రతిబంధకం: నేల pH ${inputs.soilPh} (అనుకూలమైనది ${targetPh}).`);
+      } else if (language === "hi") {
+        reasons.push(`अम्लीय मिट्टी तनाव: मिट्टी का pH ${inputs.soilPh} है (अनुकूल ${targetPh})।`);
+      } else {
+        reasons.push(`Acidic Soil Stress: Soil pH is ${inputs.soilPh} (Optimal is ${targetPh}). Causes Phosphorus fixation & aluminum root toxicity.`);
+      }
     }
   }
 
   // Water & Rainfall constraint
   if (cropKey === "rice" || cropKey === "sugarcane" || cropKey === "banana" || cropKey === "jute") {
     if (inputs.waterAvailability === "Low" || inputs.rainfallMm < 700) {
-      reasons.push(`Moisture Deficit: ${cropName} requires high water supply (>800mm rain or canal irrigation), but field moisture is Low (${inputs.rainfallMm}mm rain).`);
+      if (language === "ta") {
+        reasons.push(`நீர் பற்றாக்குறை: ${cropName} பயிருக்கு அதிக நீர் தேவை, ஆனால் உங்கள் வயலில் நீர் அளவு குறைவாக உள்ளது (${inputs.rainfallMm}மிமீ மழை).`);
+      } else if (language === "te") {
+        reasons.push(`నీటి కొరత: ${cropName} పంటకు అధిక నీరు అవసరం, కానీ మీ పొలంలో నీటి లభ్యత తక్కువగా ఉంది (${inputs.rainfallMm}మి.మీ వర్షపాతం).`);
+      } else if (language === "hi") {
+        reasons.push(`जल की कमी: ${cropName} फसल को अधिक पानी की आवश्यकता है, लेकिन आपके खेत में नमी कम है (${inputs.rainfallMm}मीमी बारिश)।`);
+      } else {
+        reasons.push(`Moisture Deficit: ${cropName} requires high water supply (>800mm rain or canal irrigation), but field moisture is Low (${inputs.rainfallMm}mm rain).`);
+      }
     }
   } else if (cropKey === "chickpea" || cropKey === "pearl_millet" || cropKey === "mustard" || cropKey === "sesame") {
     if (inputs.rainfallMm > 1000 || inputs.waterAvailability === "High") {
-      reasons.push(`Waterlogging / Rot Risk: ${cropName} suffers root rot & wilt under excessive rainfall (${inputs.rainfallMm}mm rain).`);
+      if (language === "ta") {
+        reasons.push(`தேங்கு நீர் ஆபத்து: அதிக மழையினால் (${inputs.rainfallMm}மிமீ) வேர் அழுகல் நோய் ஏற்பட வாய்ப்புள்ளது.`);
+      } else if (language === "te") {
+        reasons.push(`నీరు నిలిచే ముప్పు: అధిక వర్షపాతం (${inputs.rainfallMm}మి.మీ) వల్ల వేరు కుళ్ళు తెగులు వచ్చే అవకాశం ఉంది.`);
+      } else if (language === "hi") {
+        reasons.push(`जलजमाव का जोखिम: अत्यधिक वर्षा (${inputs.rainfallMm}मीमी) से जड़ सड़न रोग होने का खतरा है।`);
+      } else {
+        reasons.push(`Waterlogging / Rot Risk: ${cropName} suffers root rot & wilt under excessive rainfall (${inputs.rainfallMm}mm rain).`);
+      }
     }
   }
 
   // Nitrogen deficit
   if (inputs.nitrogen < targetN * 0.6) {
-    reasons.push(`Nitrogen Deficit: Soil N is ${inputs.nitrogen} kg/ha (Target demand for ${cropName} is ${targetN} kg/ha). Stunts leaf canopy growth.`);
+    if (language === "ta") {
+      reasons.push(`நைட்ரஜன் பற்றாக்குறை: மண்ணில் நைட்ரஜன் அளவு (${inputs.nitrogen} கிலோ/ஏக்கர்) குறைவாக உள்ளது.`);
+    } else if (language === "te") {
+      reasons.push(`నత్రజని కొరత: నేలలో నత్రజని లభ్యత (${inputs.nitrogen} కిలోలు/ఎకరా) తక్కువగా ఉంది.`);
+    } else if (language === "hi") {
+      reasons.push(`नाइट्रोजन की कमी: मिट्टी में नाइट्रोजन की मात्रा (${inputs.nitrogen} किग्रा/एकड़) कम है।`);
+    } else {
+      reasons.push(`Nitrogen Deficit: Soil N is ${inputs.nitrogen} kg/ha (Target demand for ${cropName} is ${targetN} kg/ha). Stunts leaf canopy growth.`);
+    }
   }
 
   if (reasons.length === 0) {
-    reasons.push(`Minor weather or soil nutrient variation from benchmark averages in ${inputs.distName}.`);
+    if (language === "ta") reasons.push(`${inputs.distName} பகுதியில் உள்ள தட்பவெப்பநிலை மாற்றங்கள்.`);
+    else if (language === "te") reasons.push(`${inputs.distName} ప్రాంతంలో స్వల్ప వాతావరణ మార్పులు.`);
+    else if (language === "hi") reasons.push(`${inputs.distName} क्षेत्र में मामूली मौसम परिवर्तन।`);
+    else reasons.push(`Minor weather or soil nutrient variation from benchmark averages in ${inputs.distName}.`);
   }
 
   return reasons;
 }
 
-export function calculateDynamicCropRecommendations(inputs: CustomUserInputs): CropRecommendation[] {
+export function calculateDynamicCropRecommendations(inputs: CustomUserInputs, language: string = "en"): CropRecommendation[] {
   const evaluated = ALL_SUPPORTED_CROPS.map((cropKey) => {
     const stats = getCropBenchmarkStats(cropKey);
 
@@ -186,7 +248,13 @@ export function calculateDynamicCropRecommendations(inputs: CustomUserInputs): C
     const estimatedProfit = expectedRevenue - productionCost;
     const riskAdjustedProfit = Math.round(estimatedProfit * (1 - riskScore / 150));
 
-    const constraintReasons = getAgronomicConstraintReason(cropKey, inputs);
+    const constraintReasons = getAgronomicConstraintReason(cropKey, inputs, language);
+
+    let explanation = `${displayName} scored ${decisionScore}/100 based on soil pH ${inputs.soilPh}, N-P-K ${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}, and weather in ${inputs.distName}.`;
+    if (language === "ta") explanation = `${displayName} பயிர் உங்கள் மண்ணின் pH ${inputs.soilPh}, N-P-K (${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}) மற்றும் ${inputs.distName} வானிலைக்கு ஏற்ப ${decisionScore}/100 மதிப்பெண் பெற்றது.`;
+    else if (language === "te") explanation = `${displayName} పంట మీ నేల pH ${inputs.soilPh}, N-P-K (${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}) మరియు ${inputs.distName} వాతావరణానికి అనుగుణంగా ${decisionScore}/100 స్కోరు సాధించింది.`;
+    else if (language === "kn") explanation = `${displayName} ಬೆಳೆ ನಿಮ್ಮ ಮಣ್ಣಿನ pH ${inputs.soilPh} ಮತ್ತು ${inputs.distName} ಹವಾಮಾನಕ್ಕೆ ಅನುಗುಣವಾಗಿ ${decisionScore}/100 ಅಂಕ ಪಡೆದಿದೆ.`;
+    else if (language === "hi") explanation = `${displayName} फसल आपकी मिट्टी pH ${inputs.soilPh}, N-P-K (${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}) और ${inputs.distName} के मौसम के अनुसार ${decisionScore}/100 स्कोर करती है।`;
 
     return {
       crop: displayName,
@@ -204,7 +272,7 @@ export function calculateDynamicCropRecommendations(inputs: CustomUserInputs): C
       productionCost,
       estimatedProfit,
       riskAdjustedProfit,
-      explanation: `${displayName} (${stats?.category || "Crop"}) scored ${decisionScore}/100 based on your custom soil pH (${inputs.soilPh}), N-P-K (${inputs.nitrogen}-${inputs.phosphorus}-${inputs.potassium}), temperature (${inputs.temperatureC}°C), and rainfall (${inputs.rainfallMm}mm) in ${inputs.distName}.`,
+      explanation,
       whyNot: constraintReasons.join(" ")
     };
   });
@@ -263,11 +331,11 @@ export function getDynamicCropCycle(inputs: CustomUserInputs): CropCycle {
   };
 }
 
-export function getDynamicCropRisk(inputs: CustomUserInputs): CropRisk {
-  const recs = calculateDynamicCropRecommendations(inputs);
+export function getDynamicCropRisk(inputs: CustomUserInputs, language: string = "en"): CropRisk {
+  const recs = calculateDynamicCropRecommendations(inputs, language);
   const selectedRec = recs.find((r) => r.crop.toLowerCase().includes(inputs.selectedCrop.toLowerCase())) || recs[0];
 
-  const constraintReasons = getAgronomicConstraintReason(inputs.selectedCrop, inputs);
+  const constraintReasons = getAgronomicConstraintReason(inputs.selectedCrop, inputs, language);
 
   return {
     overallScore: selectedRec.riskScore,
@@ -283,7 +351,7 @@ export function getDynamicCropRisk(inputs: CustomUserInputs): CropRisk {
       production: Math.round(100 - selectedRec.productionScore)
     },
     factors: constraintReasons.map((reason, idx) => ({
-      factor: `Agronomic Constraint #${idx + 1}`,
+      factor: language === "ta" ? `வேளாண் காரணி #${idx + 1}` : language === "te" ? `వ్యవసాయ అంశం #${idx + 1}` : language === "hi" ? `कृषि कारक #${idx + 1}` : `Agronomic Factor #${idx + 1}`,
       category: "soil",
       severity: selectedRec.riskLevel === "LOW" ? "LOW" : selectedRec.riskLevel === "MODERATE" ? "MODERATE" : "HIGH",
       impact: 20,
