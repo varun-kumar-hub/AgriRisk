@@ -114,12 +114,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGoogle = async () => {
     const isNative = Capacitor.isNativePlatform();
     
-    // Use com.agririsk.app://auth/callback on Android Native, or window.location.origin on Web
-    const redirectTo = isNative
-      ? "com.agririsk.app://auth/callback"
-      : typeof window !== "undefined"
-      ? `${window.location.origin}/auth/callback`
-      : "https://agri-risk1.vercel.app/auth/callback";
+    // Always use production Vercel URL for OAuth callback so physical Android devices avoid localhost:3000 errors
+    const redirectTo = "https://agri-risk1.vercel.app/auth/callback";
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
