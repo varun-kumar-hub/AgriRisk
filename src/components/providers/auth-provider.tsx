@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Initial session restoration on startup (Cold Start / App Launch)
+    // Initial session restoration on startup
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -43,23 +43,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Android Native Deep Link & OAuth Callback Handler
     let appUrlListener: any = null;
+    let browserFinishedListener: any = null;
+
     if (Capacitor.isNativePlatform()) {
+      // Close browser when deep link URL opens the native app
       appUrlListener = App.addListener("appUrlOpen", async (event) => {
         const url = event.url;
         if (!url) return;
 
-        // Check if URL matches AgriRisk Auth Callback (Scheme or Web URL)
+        // Force close Chrome Custom Tab immediately
+        try {
+          await Browser.close();
+        } catch (e) {}
+
+        // Handle Deep Link Callback Tokens or Code
         if (
           url.includes("auth/callback") ||
           url.includes("access_token=") ||
           url.includes("code=") ||
           url.startsWith("com.agririsk.app://")
         ) {
-          // Close Chrome / Custom Tab if open
-          try {
-            await Browser.close();
-          } catch (e) {}
-
           // Handle Implicit Flow (#access_token=... & refresh_token=...)
           if (url.includes("access_token=")) {
             try {
@@ -101,21 +104,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
       });
+
+      // Also listen to browserFinished event to refresh session state if user closed browser
+      browserFinishedListener = Browser.addListener("browserFinished", async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          setSession(session);
+          setUser(session.user);
+        }
+      });
     }
 
     return () => {
       subscription.unsubscribe();
-      if (appUrlListener) {
-        appUrlListener.remove();
-      }
+      if (appUrlListener) appUrlListener.remove();
+      if (browserFinishedListener) browserFinishedListener.remove();
     };
   }, [supabase]);
 
   const signInWithGoogle = async () => {
     const isNative = Capacitor.isNativePlatform();
     
-    // Always use production Vercel URL for OAuth callback so physical Android devices avoid localhost:3000 errors
-    const redirectTo = "https://agri-risk1.vercel.app/auth/callback";
+    // On native Android, use custom app scheme com.agririsk.app://auth/callback so Chrome Custom Tab automatically closes and hands back control to the app
+    const redirectTo = isNative
+      ? "com.agririsk.app://auth/callback"
+      : typeof window !== "undefined"
+      ? `${window.location.origin}/auth/callback`
+      : "https://agri-risk1.vercel.app/auth/callback";
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
