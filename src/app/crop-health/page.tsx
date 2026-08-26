@@ -9,7 +9,7 @@ import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export default function CropHealthPage() {
   const { farm, activeCropCycle, cropRisk, inputs } = useUserInput();
-  const { t, getCropName, getRiskLevelLabel } = useTranslation();
+  const { t, getCropName, getRiskLevelLabel, getGrowthStageLabel } = useTranslation();
 
   // Calculate dynamic vegetation health metrics based on soil & weather inputs
   const ndviIndex = Math.round((0.78 - (cropRisk.overallScore / 100) * 0.25) * 100) / 100;

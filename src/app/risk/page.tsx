@@ -14,7 +14,7 @@ import { useTranslation } from "@/lib/i18n/i18n-context";
 
 export default function RiskIntelligencePage() {
   const { farm, activeCropCycle, cropRisk, inputs } = useUserInput();
-  const { t, getCropName, getRiskLevelLabel } = useTranslation();
+  const { t, getCropName, getRiskLevelLabel, getGrowthStageLabel } = useTranslation();
   const [activeTab, setActiveTab] = useState<"before" | "after">("before");
 
   // Dynamic Risk calculations based on user inputs
